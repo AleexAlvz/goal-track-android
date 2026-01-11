@@ -46,32 +46,41 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(signupModel: SignupModel): NetworkResponse<Unit> {
-        val body = signupModel.toData()
-        val jsonBody = JsonHelper.toJson(body, SignupDTO.serializer())
-        val response = networkProvider.request(
-            networkRequest = NetworkRequest(
-                endpoint = SIGNUP_ENDPOINT,
-                method = NetworkMethod.POST,
-                bodyJson = jsonBody
+        try {
+            val body = signupModel.toData()
+            val jsonBody = JsonHelper.toJson(body, SignupDTO.serializer())
+            val response = networkProvider.request(
+                networkRequest = NetworkRequest(
+                    endpoint = SIGNUP_ENDPOINT,
+                    method = NetworkMethod.POST,
+                    bodyJson = jsonBody
+                )
             )
-        )
 
-        response.onSuccess { AuthManager.clearAuthenticatedUser() }
-        return response
+            response.onSuccess { AuthManager.clearAuthenticatedUser() }
+            return response
+        } catch (error: Exception) {
+            return NetworkResponse.Failure(error)
+        }
+
     }
 
     override suspend fun recoveryPassword(recoveryPasswordModel: RecoveryPasswordModel): NetworkResponse<Unit> {
-        val body = recoveryPasswordModel.toData()
-        val jsonBody = JsonHelper.toJson(body, RecoveryPasswordDTO.serializer())
-        val response = networkProvider.request(
-            networkRequest = NetworkRequest(
-                endpoint = RECOVERY_PASSWORD_ENDPOINT,
-                method = NetworkMethod.POST,
-                bodyJson = jsonBody
+        try {
+            val body = recoveryPasswordModel.toData()
+            val jsonBody = JsonHelper.toJson(body, RecoveryPasswordDTO.serializer())
+            val response = networkProvider.request(
+                networkRequest = NetworkRequest(
+                    endpoint = RECOVERY_PASSWORD_ENDPOINT,
+                    method = NetworkMethod.POST,
+                    bodyJson = jsonBody
+                )
             )
-        )
 
-        return response
+            return response
+        } catch (error: Exception) {
+            return NetworkResponse.Failure(error)
+        }
     }
 
     private fun NetworkResponse<LoginResponse>.toUnitResponse(): NetworkResponse<Unit> =

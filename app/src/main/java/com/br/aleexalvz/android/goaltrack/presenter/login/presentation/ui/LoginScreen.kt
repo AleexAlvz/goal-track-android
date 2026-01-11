@@ -57,7 +57,7 @@ fun LoginScreen(
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
 
-    val loginState: LoginState by loginViewModel.loginState.collectAsStateWithLifecycle()
+    val loginState: LoginState by loginViewModel.state.collectAsStateWithLifecycle()
 
     LoginEventHandler(
         loginViewModel = loginViewModel,
@@ -199,8 +199,8 @@ private fun LoginEventHandler(
     var dialogMessage by remember { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        loginViewModel.loginEvents.collect { event ->
+    LaunchedEffect(loginViewModel) {
+        loginViewModel.event.collect { event ->
             when (event) {
                 LoginEvent.OnLoginSuccess -> {
                     onLoginSuccess()
@@ -212,7 +212,7 @@ private fun LoginEventHandler(
                     dialogMessage = context.getString(R.string.invalid_credentials_error_message)
                 }
 
-                LoginEvent.NetworkFailure -> {
+                LoginEvent.ConnectionError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.network_error_title)
                     dialogMessage = context.getString(R.string.network_error_message)

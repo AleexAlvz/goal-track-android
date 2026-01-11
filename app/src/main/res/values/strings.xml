@@ -14,4 +14,5 @@
     <string name="network_error_message">Não foi possível se comunicar com o servidor.</string>
     <string name="unexpected_error_title">Erro inesperado</string>
     <string name="unexpected_error_message">Ocorreu um erro inesperado. Tente novamente mais tarde.</string>
+    <string name="signup_with_success">Conta criada com sucesso!</string>
 </resources>

@@ -25,7 +25,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,13 +35,13 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow(LoginState())
-    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    private val _state = MutableStateFlow(LoginState())
+    val state: StateFlow<LoginState> = _state.asStateFlow()
 
-    private val _loginEvents = MutableSharedFlow<LoginEvent>()
-    val loginEvents = _loginEvents.asSharedFlow()
+    private val _event = MutableSharedFlow<LoginEvent>()
+    val event = _event.asSharedFlow()
 
-    fun onUIAction(uiAction: LoginAction) = viewModelScope.launch(IO) {
+    fun onUIAction(uiAction: LoginAction) {
         when (uiAction) {
             is LoginAction.UpdateEmail -> updateEmail(uiAction.email)
 
@@ -54,52 +56,50 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateEmail(email: String) = updateLoginState {
+    private fun updateEmail(email: String) = _state.update {
         it.copy(email = email)
     }
 
-    private suspend fun updatePassword(password: String) = updateLoginState {
+    private fun updatePassword(password: String) = _state.update {
         it.copy(password = password)
     }
 
-    private suspend fun updateRememberMe(rememberMe: Boolean) = updateLoginState {
+    private fun updateRememberMe(rememberMe: Boolean) = _state.update {
         it.copy(rememberMe = rememberMe)
     }
 
-    private suspend fun updateLoginState(block: (loginState: LoginState) -> LoginState) {
-        block(_loginState.value).let { _loginState.emit(it) }
-    }
+    private fun submitLogin() = viewModelScope.launch {
+        _state.update { it.copy(isLoading = true) }
 
-    private suspend fun submitLogin() {
-        updateLoginState { it.copy(isLoading = true) }
-
-        val response = authRepository.login(
-            LoginModel(
-                email = loginState.value.email,
-                password = loginState.value.password
+        val response = withContext(IO) {
+            authRepository.login(
+                LoginModel(
+                    email = state.value.email,
+                    password = state.value.password
+                )
             )
-        )
+        }
         handleLoginResponse(response)
 
-        updateLoginState { it.copy(isLoading = false) }
+        _state.update { it.copy(isLoading = false) }
     }
 
     private suspend fun handleLoginResponse(response: NetworkResponse<Unit>) {
         response.onSuccess {
-            _loginEvents.emit(LoginEvent.OnLoginSuccess)
+            _event.emit(LoginEvent.OnLoginSuccess)
         }.onFailure {
             when (it) {
                 is NetworkException -> {
                     val event: LoginEvent = when (it.error) {
-                        ServerError, Timeout, ConnectionError -> LoginEvent.NetworkFailure
+                        ServerError, Timeout, ConnectionError -> LoginEvent.ConnectionError
                         InvalidCredentials, BadRequest -> LoginEvent.InvalidCredentials
                         UnexpectedResponse, Unknown -> LoginEvent.UnexpectedError
                     }
-                    _loginEvents.emit(event)
+                    _event.emit(event)
                 }
 
                 else -> {
-                    _loginEvents.emit(LoginEvent.UnexpectedError)
+                    _event.emit(LoginEvent.UnexpectedError)
                 }
             }
         }
