@@ -1,5 +1,6 @@
 package com.br.aleexalvz.android.goaltrack.core.network.data
 
+import com.br.aleexalvz.android.goaltrack.core.common.JsonHelper
 import com.br.aleexalvz.android.goaltrack.core.network.domain.NetworkProvider
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
@@ -7,6 +8,8 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkHeaders
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.data.auth.AuthManager
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.builtins.serializer
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -20,6 +23,7 @@ import javax.inject.Inject
 
 private const val BASE_URL_TEST = "http://10.0.2.2:8080/"
 private const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
+private const val UNEXPECTED_RESPONSE_BODY_NULL = "Response body is empty but was expected"
 
 class NetworkProviderImpl @Inject constructor(
     private val okHttpClient: OkHttpClient
@@ -27,22 +31,25 @@ class NetworkProviderImpl @Inject constructor(
 
     override suspend fun <T> request(
         networkRequest: NetworkRequest,
-        responseType: Class<T>
+        responseSerializer: KSerializer<T>
     ): NetworkResponse<T> = try {
         val request = getRequest(networkRequest)
         val response = okHttpClient.newCall(request).execute()
-        handleResponse(response, responseType)
+        handleResponse(response, responseSerializer)
     } catch (e: Exception) {
         NetworkResponse.Failure(e.toNetworkException())
     }
 
     override suspend fun request(networkRequest: NetworkRequest): NetworkResponse<Unit> {
-        return request(networkRequest, Unit::class.java)
+        return request(networkRequest, Unit.serializer())
     }
 
-    private fun <T> handleResponse(response: Response, responseType: Class<T>): NetworkResponse<T> {
+    private fun <T> handleResponse(
+        response: Response,
+        responseSerializer: KSerializer<T>
+    ): NetworkResponse<T> {
         return if (response.isSuccessful) {
-            handleSuccessfulResponse(response, responseType)
+            handleSuccessfulResponse(response, responseSerializer)
         } else {
             return NetworkResponse.Failure(response.toNetworkException())
         }
@@ -51,24 +58,39 @@ class NetworkProviderImpl @Inject constructor(
     @Suppress("UNCHECKED_CAST")
     private fun <T> handleSuccessfulResponse(
         response: Response,
-        responseType: Class<T>
+        responseSerializer: KSerializer<T>
     ): NetworkResponse<T> {
         val bodyResponse = response.body?.string()
-        return if (bodyResponse.isNullOrBlank()) {
-            if (responseType == Unit::class.java) {
-                NetworkResponse.Success(bodyResponse as T) //TODO rever serialização de sucesso
-            } else {
+
+        if (responseSerializer == Unit.serializer()) {
+            return NetworkResponse.Success(Unit as T)
+        }
+
+        if (bodyResponse.isNullOrBlank()) {
+            return NetworkResponse.Failure(
+                NetworkException(
+                    error = NetworkError.UnexpectedResponse,
+                    statusCode = response.code,
+                    message = UNEXPECTED_RESPONSE_BODY_NULL
+                )
+            )
+        }
+
+        return runCatching {
+            JsonHelper.fromJson(bodyResponse, responseSerializer)
+        }.fold(
+            onSuccess = { NetworkResponse.Success(it) },
+            onFailure = {
                 NetworkResponse.Failure(
-                    exception = NetworkException(
+                    NetworkException(
                         error = NetworkError.UnexpectedResponse,
                         statusCode = response.code,
-                        message = response.message
+                        message = it.message,
+                        cause = it
                     )
                 )
             }
-        } else {
-            NetworkResponse.Success(bodyResponse as T)
-        }
+        )
     }
 
     private fun getRequest(networkRequest: NetworkRequest) =

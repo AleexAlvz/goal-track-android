@@ -35,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
                     method = NetworkMethod.POST,
                     bodyJson = jsonBody
                 ),
-                responseType = LoginResponse::class.java
+                responseSerializer = LoginResponse.serializer()
             )
 
             response.onSuccess { AuthManager.setAuthToken(it.token) }
