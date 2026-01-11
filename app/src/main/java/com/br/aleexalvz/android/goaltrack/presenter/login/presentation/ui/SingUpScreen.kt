@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.aleexalvz.login.presentation.model.SignUpAction
-import com.aleexalvz.login.presentation.model.SignUpState
+import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpAction
+import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpState
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.DefaultOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.PasswordOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.login.navigation.LoginRoutes

@@ -1,4 +1,4 @@
-package com.aleexalvz.login.presentation.model
+package com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model
 
 /**
  * Data that represents UI State from SignUp Screen

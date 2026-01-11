@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Goal Track</string>
+    <string name="go_to_signup">Novo por aqui? Cadastrar</string>
+    <string name="login_with_google">Entrar com Google</string>
+    <string name="login">Entrar</string>
+    <string name="password">Senha</string>
+    <string name="email">Email</string>
+    <string name="welcome">Bem vindo</string>
+    <string name="or">Ou</string>
+    <string name="ok">ok</string>
+    <string name="invalid_credentials_error_title">Não foi possível entrar</string>
+    <string name="invalid_credentials_error_message">E-mail ou senha inválidos.</string>
+    <string name="network_error_title">Erro de conexão</string>
+    <string name="network_error_message">Não foi possível se comunicar com o servidor.</string>
+    <string name="unexpected_error_title">Erro inesperado</string>
+    <string name="unexpected_error_message">Ocorreu um erro inesperado. Tente novamente mais tarde.</string>
 </resources>

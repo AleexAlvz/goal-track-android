@@ -1,8 +1,8 @@
 package com.br.aleexalvz.android.goaltrack.presenter.login.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.aleexalvz.login.presentation.model.SignUpAction
-import com.aleexalvz.login.presentation.model.SignUpState
+import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpAction
+import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpState
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -1,0 +1,20 @@
+package com.br.aleexalvz.android.goaltrack.data.mapper
+
+import com.br.aleexalvz.android.goaltrack.data.dto.LoginDTO
+import com.br.aleexalvz.android.goaltrack.data.dto.RecoveryPasswordDTO
+import com.br.aleexalvz.android.goaltrack.data.dto.SignupDTO
+import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
+import com.br.aleexalvz.android.goaltrack.domain.model.RecoveryPasswordModel
+import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
+
+// Login
+fun LoginModel.toData() = LoginDTO(email, password)
+fun LoginDTO.toDomain() = LoginModel(email, password)
+
+// Signup
+fun SignupModel.toData() = SignupDTO(email = email, password = password)
+fun SignupDTO.toDomain() = SignupModel(email = email, password = password)
+
+// Recovery Password
+fun RecoveryPasswordModel.toData() = RecoveryPasswordDTO(email = email)
+fun RecoveryPasswordDTO.toDomain() = RecoveryPasswordModel(email = email)

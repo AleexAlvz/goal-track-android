@@ -8,35 +8,49 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.data.auth.AuthManager
 import com.br.aleexalvz.android.goaltrack.data.auth.model.LoginResponse
+import com.br.aleexalvz.android.goaltrack.data.dto.LoginDTO
+import com.br.aleexalvz.android.goaltrack.data.dto.RecoveryPasswordDTO
+import com.br.aleexalvz.android.goaltrack.data.dto.SignupDTO
+import com.br.aleexalvz.android.goaltrack.data.mapper.toData
+import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.LOGIN_ENDPOINT
+import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.RECOVERY_PASSWORD_ENDPOINT
+import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.SIGNUP_ENDPOINT
 import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
 import com.br.aleexalvz.android.goaltrack.domain.model.RecoveryPasswordModel
-import com.br.aleexalvz.android.goaltrack.domain.model.SignUpModel
+import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
+import javax.inject.Inject
 
-class AuthRepositoryImpl(private val networkProvider: NetworkProvider) : AuthRepository {
+class AuthRepositoryImpl @Inject constructor(
+    private val networkProvider: NetworkProvider
+) : AuthRepository {
 
     override suspend fun login(loginModel: LoginModel): NetworkResponse<Unit> {
-        val body = LoginModel(loginModel.email, loginModel.password)
-        val jsonBody = JsonHelper.toJson(body, LoginModel.serializer())
-        val response = networkProvider.request(
-            networkRequest = NetworkRequest(
-                endpoint = "auth/login",
-                method = NetworkMethod.POST,
-                bodyJson = jsonBody
-            ),
-            responseType = LoginResponse::class.java
-        )
+        try {
+            val body = loginModel.toData()
+            val jsonBody = JsonHelper.toJson(body, LoginDTO.serializer())
+            val response = networkProvider.request(
+                networkRequest = NetworkRequest(
+                    endpoint = LOGIN_ENDPOINT,
+                    method = NetworkMethod.POST,
+                    bodyJson = jsonBody
+                ),
+                responseType = LoginResponse::class.java
+            )
 
-        response.onSuccess { AuthManager.setAuthToken(it.token) }
-        return response.toUnitResponse()
+            response.onSuccess { AuthManager.setAuthToken(it.token) }
+            return response.toUnitResponse()
+        } catch (error: Exception) {
+            return NetworkResponse.Failure(error)
+        }
     }
 
-    override suspend fun signUp(signUpModel: SignUpModel): NetworkResponse<Unit> {
-        val body = SignUpModel(signUpModel.email, signUpModel.password)
-        val jsonBody = JsonHelper.toJson(body, SignUpModel.serializer())
+    override suspend fun signUp(signupModel: SignupModel): NetworkResponse<Unit> {
+        val body = signupModel.toData()
+        val jsonBody = JsonHelper.toJson(body, SignupDTO.serializer())
         val response = networkProvider.request(
             networkRequest = NetworkRequest(
-                endpoint = "auth/register",
+                endpoint = SIGNUP_ENDPOINT,
                 method = NetworkMethod.POST,
                 bodyJson = jsonBody
             )
@@ -47,11 +61,11 @@ class AuthRepositoryImpl(private val networkProvider: NetworkProvider) : AuthRep
     }
 
     override suspend fun recoveryPassword(recoveryPasswordModel: RecoveryPasswordModel): NetworkResponse<Unit> {
-        val body = RecoveryPasswordModel(recoveryPasswordModel.email)
-        val jsonBody = JsonHelper.toJson(body, RecoveryPasswordModel.serializer())
+        val body = recoveryPasswordModel.toData()
+        val jsonBody = JsonHelper.toJson(body, RecoveryPasswordDTO.serializer())
         val response = networkProvider.request(
             networkRequest = NetworkRequest(
-                endpoint = "auth/register",
+                endpoint = RECOVERY_PASSWORD_ENDPOINT,
                 method = NetworkMethod.POST,
                 bodyJson = jsonBody
             )

@@ -1,4 +1,4 @@
-package com.aleexalvz.login.presentation.model
+package com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model
 
 sealed class SignUpAction {
     data class UpdateEmail(val email: String): SignUpAction()

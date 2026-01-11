@@ -2,13 +2,12 @@ package com.br.aleexalvz.android.goaltrack.presenter.components.textfield
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.outlined.VisibilityOff
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
@@ -30,7 +31,9 @@ fun PasswordOutlinedTextField(
     onValueChange: (String) -> Unit,
     labelText: String,
     contentDescription: String,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeAction: (() -> Unit)? = null
 ) {
     val passwordHidden = rememberSaveable { mutableStateOf(true) }
     val visualTransformation =
@@ -79,6 +82,14 @@ fun PasswordOutlinedTextField(
                 contentDescription = contentDescription
             )
         },
-//        colors = passwordTextFielColor()
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = imeAction
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeAction?.invoke()
+            }
+        )
     )
 }
