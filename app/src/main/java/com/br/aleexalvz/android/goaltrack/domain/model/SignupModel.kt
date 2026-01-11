@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SignupModel(
     val email: String,
-    val password: String
+    val password: String,
+    val confirmPassword: String
 )

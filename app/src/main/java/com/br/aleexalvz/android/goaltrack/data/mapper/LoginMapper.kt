@@ -12,8 +12,11 @@ fun LoginModel.toData() = LoginDTO(email, password)
 fun LoginDTO.toDomain() = LoginModel(email, password)
 
 // Signup
-fun SignupModel.toData() = SignupDTO(email = email, password = password)
-fun SignupDTO.toDomain() = SignupModel(email = email, password = password)
+fun SignupModel.toData() =
+    SignupDTO(email = email, password = password, confirmPassword = confirmPassword)
+
+fun SignupDTO.toDomain() =
+    SignupModel(email = email, password = password, confirmPassword = confirmPassword)
 
 // Recovery Password
 fun RecoveryPasswordModel.toData() = RecoveryPasswordDTO(email = email)

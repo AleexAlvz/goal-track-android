@@ -58,6 +58,7 @@ class SignUpViewModel @Inject constructor(
                 SignupModel(
                     email = state.value.email,
                     password = state.value.password,
+                    confirmPassword = state.value.confirmPassword,
                 )
             )
         }
