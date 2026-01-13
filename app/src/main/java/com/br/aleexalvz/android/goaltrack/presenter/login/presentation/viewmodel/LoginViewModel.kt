@@ -15,6 +15,8 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginAction
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginEvent
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginState
@@ -69,19 +71,22 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun submitLogin() = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true) }
+        validateFields()
+        if (hasValidFields()) {
+            _state.update { it.copy(isLoading = true) }
 
-        val response = withContext(IO) {
-            authRepository.login(
-                LoginModel(
-                    email = state.value.email,
-                    password = state.value.password
+            val response = withContext(IO) {
+                authRepository.login(
+                    LoginModel(
+                        email = state.value.email,
+                        password = state.value.password
+                    )
                 )
-            )
-        }
-        handleLoginResponse(response)
+            }
+            handleLoginResponse(response)
 
-        _state.update { it.copy(isLoading = false) }
+            _state.update { it.copy(isLoading = false) }
+        }
     }
 
     private suspend fun handleLoginResponse(response: NetworkResponse<Unit>) {
@@ -103,5 +108,17 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun validateFields(): Unit = with(state.value) {
+        val emailResult = email.validateEmail()
+        val passwordResult = password.validateIsNotBlank()
+
+        _state.update { it.copy(emailError = emailResult.exceptionOrNull()?.message) }
+        _state.update { it.copy(passwordError = passwordResult.exceptionOrNull()?.message) }
+    }
+
+    private fun hasValidFields() = with(state.value) {
+        emailError.isNullOrBlank() && passwordError.isNullOrBlank()
     }
 }

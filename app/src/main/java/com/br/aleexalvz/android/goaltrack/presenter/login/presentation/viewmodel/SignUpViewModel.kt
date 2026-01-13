@@ -9,6 +9,9 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validateConfirmPassword
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validatePassword
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpAction
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpEvent
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignupState
@@ -51,21 +54,23 @@ class SignUpViewModel @Inject constructor(
     }
 
     private fun submitSignUp() = viewModelScope.launch {
-        _state.update { it.copy(isLoading = true) }
+        validateFields()
+        if (hasValidFields()) {
+            _state.update { it.copy(isLoading = true) }
 
-        val response = withContext(IO) {
-            authRepository.signUp(
-                SignupModel(
-                    email = state.value.email,
-                    password = state.value.password,
-                    confirmPassword = state.value.confirmPassword,
+            val response = withContext(IO) {
+                authRepository.signUp(
+                    SignupModel(
+                        email = state.value.email,
+                        password = state.value.password,
+                        confirmPassword = state.value.confirmPassword,
+                    )
                 )
-            )
+            }
+
+            handleSignUpResponse(response)
+            _state.update { it.copy(isLoading = false) }
         }
-
-        handleSignUpResponse(response)
-
-        _state.update { it.copy(isLoading = false) }
     }
 
     private suspend fun handleSignUpResponse(response: NetworkResponse<Unit>) {
@@ -87,5 +92,19 @@ class SignUpViewModel @Inject constructor(
                 else -> _events.emit(SignUpEvent.UnexpectedError)
             }
         }
+    }
+
+    private fun validateFields(): Unit = with(state.value) {
+        val emailResult = email.validateEmail()
+        val passwordResult = password.validatePassword()
+        val confirmPasswordResult = confirmPassword.validateConfirmPassword(password)
+
+        _state.update { it.copy(emailError = emailResult.exceptionOrNull()?.message) }
+        _state.update { it.copy(passwordError = passwordResult.exceptionOrNull()?.message) }
+        _state.update { it.copy(confirmPasswordError = confirmPasswordResult.exceptionOrNull()?.message) }
+    }
+
+    private fun hasValidFields() = with(state.value) {
+        emailError.isNullOrBlank() && passwordError.isNullOrBlank() && confirmPasswordError.isNullOrBlank()
     }
 }
