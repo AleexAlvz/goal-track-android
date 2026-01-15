@@ -4,7 +4,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Construction
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -33,14 +36,17 @@ fun AppNavGraph() {
     }
 
     val bottomNavigationItems = listOf(
-        BottomNavItem("Home", HomeRoutes.HOME, Icons.Filled.Home),
+        BottomNavItem("Goals", HomeRoutes.Goals, Icons.Outlined.TaskAlt),
+        BottomNavItem("Actions", HomeRoutes.Actions, Icons.Outlined.Home),
+        BottomNavItem("Calendar", HomeRoutes.Calendar, Icons.Outlined.CalendarMonth),
+        BottomNavItem("Friends", HomeRoutes.Friends, Icons.Outlined.Construction),
     )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             if (shouldShowNavigationBar(currentScreen.value)) {
-                NavigationBar(navController, bottomNavigationItems, HomeRoutes.HOME)
+                NavigationBar(navController, bottomNavigationItems, HomeRoutes.Home)
             }
         }
     ) { innerPadding ->
@@ -48,7 +54,7 @@ fun AppNavGraph() {
             NavHost(
                 navController = navController,
                 startDestination = LoginRoutes.LOGIN
-            ){
+            ) {
                 registerFeatureLoginRoutes(navController)
                 registerFeatureHomeRoutes(navController)
             }

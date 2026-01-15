@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.data.auth
+package com.br.aleexalvz.android.goaltrack.data
 
 object AuthManager {
     private var authToken: String? = null

@@ -1,13 +1,18 @@
 package com.br.aleexalvz.android.goaltrack.presenter.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
@@ -26,19 +31,26 @@ fun NavigationBar(
 
     val backStackEntry = navController.currentBackStackEntryAsState()
 
-    NavigationBar {
+    HorizontalDivider(
+        Modifier
+            .fillMaxWidth()
+            .height(1.dp))
+
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
         items.forEach { item ->
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,
-                    unselectedIconColor = Color.White,
-                    indicatorColor = Color.Cyan,
-                    selectedTextColor = Color.White,
-                    unselectedTextColor = Color.White
+                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.onPrimary,
                 ),
                 selected = item.route == backStackEntry.value?.destination?.route,
                 onClick = {
-                    if (item.route != backStackEntry.value?.destination?.route){
+                    if (item.route != backStackEntry.value?.destination?.route) {
                         navController.navigate(route = item.route) {
                             popUpToRoute?.let { popUpTo(it) }
                             launchSingleTop = true

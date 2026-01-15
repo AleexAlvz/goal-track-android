@@ -6,11 +6,11 @@ import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkMethod
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.data.auth.AuthManager
-import com.br.aleexalvz.android.goaltrack.data.auth.model.LoginResponse
-import com.br.aleexalvz.android.goaltrack.data.dto.LoginDTO
-import com.br.aleexalvz.android.goaltrack.data.dto.RecoveryPasswordDTO
-import com.br.aleexalvz.android.goaltrack.data.dto.SignupDTO
+import com.br.aleexalvz.android.goaltrack.data.AuthManager
+import com.br.aleexalvz.android.goaltrack.data.model.response.LoginResponse
+import com.br.aleexalvz.android.goaltrack.data.model.dto.LoginDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.RecoveryPasswordDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.SignupDTO
 import com.br.aleexalvz.android.goaltrack.data.mapper.toData
 import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.LOGIN_ENDPOINT
 import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.RECOVERY_PASSWORD_ENDPOINT

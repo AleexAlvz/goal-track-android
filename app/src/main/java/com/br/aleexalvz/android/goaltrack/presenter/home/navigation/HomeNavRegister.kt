@@ -8,9 +8,12 @@ import androidx.navigation.navigation
 
 fun NavGraphBuilder.registerFeatureHomeRoutes(navController: NavController) {
     navigation(
-        route = HomeRoutes.FEATURE_HOME,
-        startDestination = HomeRoutes.HOME
+        route = HomeRoutes.Home,
+        startDestination = HomeRoutes.Goals
     ) {
-        composable(route = HomeRoutes.HOME) { Text("Welcome to home!") }
+        composable(route = HomeRoutes.Goals) { Text("Welcome to Goals!") }
+        composable(route = HomeRoutes.Actions) { Text("Welcome to Actions!") }
+        composable(route = HomeRoutes.Calendar) { Text("Welcome to Calendar!") }
+        composable(route = HomeRoutes.Friends) { Text("Welcome to Friends!") }
     }
 }

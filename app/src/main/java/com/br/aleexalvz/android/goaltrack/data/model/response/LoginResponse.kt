@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.data.auth.model
+package com.br.aleexalvz.android.goaltrack.data.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

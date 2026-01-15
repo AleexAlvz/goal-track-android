@@ -1,4 +1,4 @@
-package com.aleexalvz.designsystem.components.button
+package com.br.aleexalvz.android.goaltrack.presenter.components.button
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,8 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.Green
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GraySuperLight
 
 @Composable
 fun CheckBox(
@@ -49,9 +48,8 @@ fun CheckBox(
         horizontalArrangement = horizontalAlignment
     ) {
         val checkBoxColors = CheckboxDefaults.colors(
-            checkedColor = GraySuperLight,
-            uncheckedColor = GraySuperLight,
-            checkmarkColor = Green,
+            checkedColor = MaterialTheme.colorScheme.surface,
+            checkmarkColor = MaterialTheme.colorScheme.primary,
         )
 
         Checkbox(

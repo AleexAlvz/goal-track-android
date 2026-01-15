@@ -1,14 +1,12 @@
-package com.aleexalvz.designsystem.components.button
+package com.br.aleexalvz.android.goaltrack.presenter.components.button
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GrayLight
 
 @Composable
 fun BackNavigationButton(
@@ -18,7 +16,7 @@ fun BackNavigationButton(
         Icon(
             imageVector = Icons.Filled.ArrowBackIosNew,
             contentDescription = "back button",
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -28,18 +26,12 @@ fun LogoutNavigationButton(
     onClick: () -> Unit
 ) {
     IconButton(
-        onClick = onClick,
-        colors = IconButtonColors(
-            containerColor = GrayLight,
-            contentColor = Color.White,
-            disabledContainerColor = GrayLight,
-            disabledContentColor = Color.White
-        )
+        onClick = onClick
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
             contentDescription = "logout button",
-            tint = Color.White
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }

@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,9 +45,6 @@ import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.Log
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginEvent
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginState
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.viewmodel.LoginViewModel
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.LightGrayColor
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.LinkTextColor
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.PrimaryButtonColor
 
 @Composable
 fun LoginScreen(
@@ -61,7 +57,7 @@ fun LoginScreen(
 
     LoginEventHandler(
         loginViewModel = loginViewModel,
-        onLoginSuccess = { navController.navigate(HomeRoutes.HOME) }
+        onLoginSuccess = { navController.navigate(HomeRoutes.Home) }
     )
 
     LoginContent(
@@ -131,17 +127,19 @@ fun LoginContent(
             onClick = {
                 onUIAction(LoginAction.Submit)
             },
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryButtonColor),
             shape = ShapeDefaults.Medium
         ) {
             if (loginState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(18.dp),
                     strokeWidth = 2.dp,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text(stringResource(R.string.login))
+                Text(
+                    text = stringResource(R.string.login),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
 
@@ -160,13 +158,12 @@ fun LoginContent(
                 .wrapContentHeight()
                 .padding(top = 12.dp),
             onClick = { onUIAction(LoginAction.LoginWithGoogle) },
-            colors = ButtonDefaults.buttonColors(containerColor = LightGrayColor),
             shape = ShapeDefaults.Medium,
             enabled = false //TODO feature futura
         ) {
             Text(
                 text = stringResource(R.string.login_with_google),
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSecondary
             )
         }
         Box(
@@ -178,7 +175,7 @@ fun LoginContent(
         ) {
             Text(
                 modifier = Modifier.clickable { onSignupClickListener() },
-                color = LinkTextColor,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
                 text = stringResource(R.string.go_to_signup),
                 fontSize = 14.sp,

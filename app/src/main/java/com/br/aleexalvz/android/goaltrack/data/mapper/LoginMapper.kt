@@ -1,8 +1,8 @@
 package com.br.aleexalvz.android.goaltrack.data.mapper
 
-import com.br.aleexalvz.android.goaltrack.data.dto.LoginDTO
-import com.br.aleexalvz.android.goaltrack.data.dto.RecoveryPasswordDTO
-import com.br.aleexalvz.android.goaltrack.data.dto.SignupDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.LoginDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.RecoveryPasswordDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.SignupDTO
 import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
 import com.br.aleexalvz.android.goaltrack.domain.model.RecoveryPasswordModel
 import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel

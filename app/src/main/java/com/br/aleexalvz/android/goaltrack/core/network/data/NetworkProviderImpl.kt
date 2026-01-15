@@ -7,7 +7,7 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkHeaders
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.data.auth.AuthManager
+import com.br.aleexalvz.android.goaltrack.data.AuthManager
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import okhttp3.Headers

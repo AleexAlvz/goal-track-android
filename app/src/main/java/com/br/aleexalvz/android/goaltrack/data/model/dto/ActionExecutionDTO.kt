@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.data.dto
+package com.br.aleexalvz.android.goaltrack.data.model.dto
 
 data class ActionExecutionDTO(
     val id: Long,

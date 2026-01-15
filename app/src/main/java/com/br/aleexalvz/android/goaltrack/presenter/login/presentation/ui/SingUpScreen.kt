@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +38,6 @@ import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.Sig
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpEvent
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignupState
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.viewmodel.SignUpViewModel
-import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.PrimaryButtonColor
 
 @Composable
 fun SignUpScreen(
@@ -170,7 +170,6 @@ fun SignupContent(
                 .padding(top = 12.dp),
             onClick = { onUIAction(SignUpAction.Submit) },
             enabled = !state.isLoading,
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryButtonColor),
             shape = ShapeDefaults.Medium
         ) {
             Text(
