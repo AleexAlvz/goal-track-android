@@ -1,15 +1,9 @@
 package com.br.aleexalvz.android.goaltrack.presenter.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-
-//private val DarkTheme = darkColorScheme(
-//    primary = GrayDefault,
-//    secondary = GrayDefault,
-//    tertiary = Pink80,
-//    background = DarkBackground
-//)
 
 private val LightTheme = lightColorScheme(
     primary = LightThemeColors.PrimaryColor,
@@ -17,25 +11,31 @@ private val LightTheme = lightColorScheme(
     secondary = LightThemeColors.SecondaryColor,
     onSecondary = LightThemeColors.OnSecondaryColor,
     background = LightThemeColors.Background,
+    onBackground = LightThemeColors.OnBackground,
     surface = LightThemeColors.SurfaceColor,
     onSurface = LightThemeColors.OnSurfaceColor,
     onSurfaceVariant = LightThemeColors.OnSurfaceVariantColor
 )
 
+private val DarkTheme = lightColorScheme(
+    primary = DarkThemeColors.PrimaryColor,
+    onPrimary = DarkThemeColors.OnPrimaryColor,
+    secondary = DarkThemeColors.SecondaryColor,
+    onSecondary = DarkThemeColors.OnSecondaryColor,
+    background = DarkThemeColors.Background,
+    onBackground = DarkThemeColors.OnBackground,
+    surface = DarkThemeColors.SurfaceColor,
+    onSurface = DarkThemeColors.OnSurfaceColor,
+    onSurfaceVariant = DarkThemeColors.OnSurfaceVariantColor
+)
+
 @Composable
 fun GoalTrackTheme(
-//    darkTheme: Boolean = isSystemInDarkTheme(), TODO habilitar dark theme
-    // Dynamic color is available on Android 12+
-//    dynamicColor: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-
-//        darkTheme -> DarkTheme
+        darkTheme -> DarkTheme
         else -> LightTheme
     }
 

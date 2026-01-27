@@ -5,15 +5,16 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.HomeScreen
 
 fun NavGraphBuilder.registerFeatureHomeRoutes(navController: NavController) {
     navigation(
-        route = HomeRoutes.Home,
-        startDestination = HomeRoutes.Goals
+        route = HomeRoutes.HOME_GRAPH,
+        startDestination = HomeRoutes.HOME_SCREEN
     ) {
-        composable(route = HomeRoutes.Goals) { Text("Welcome to Goals!") }
-        composable(route = HomeRoutes.Actions) { Text("Welcome to Actions!") }
-        composable(route = HomeRoutes.Calendar) { Text("Welcome to Calendar!") }
-        composable(route = HomeRoutes.Friends) { Text("Welcome to Friends!") }
+        composable(route = HomeRoutes.HOME_SCREEN) { HomeScreen(navController) }
+        composable(route = HomeRoutes.ACTIONS) { Text("Welcome to Actions!") }
+        composable(route = HomeRoutes.CALENDAR) { Text("Welcome to Calendar!") }
+        composable(route = HomeRoutes.FRIENDS) { Text("Welcome to Friends!") }
     }
 }

@@ -1,20 +1,25 @@
 package com.br.aleexalvz.android.goaltrack.presenter.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.HorizontalDivider
+import android.annotation.SuppressLint
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Construction
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 
 data class BottomNavItem(
     val name: String,
@@ -23,18 +28,13 @@ data class BottomNavItem(
 )
 
 @Composable
-fun NavigationBar(
+fun AppNavigationBar(
     navController: NavController,
     items: List<BottomNavItem>,
     popUpToRoute: String? = null
 ) {
 
     val backStackEntry = navController.currentBackStackEntryAsState()
-
-    HorizontalDivider(
-        Modifier
-            .fillMaxWidth()
-            .height(1.dp))
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background
@@ -62,4 +62,24 @@ fun NavigationBar(
             )
         }
     }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Preview(showSystemUi = true)
+@Composable
+fun NavigationBarPreview() {
+    val bottomNavigationItems = listOf(
+        BottomNavItem("Goals", HomeRoutes.HOME_SCREEN, Icons.Outlined.TaskAlt),
+        BottomNavItem("Actions", HomeRoutes.ACTIONS, Icons.Outlined.Home),
+        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Outlined.CalendarMonth),
+        BottomNavItem("Friends", HomeRoutes.FRIENDS, Icons.Outlined.Construction),
+    )
+    Scaffold(bottomBar = {
+        AppNavigationBar(
+            navController = NavController(LocalContext.current),
+            items = bottomNavigationItems,
+            popUpToRoute = null
+        )
+    }) {}
+
 }

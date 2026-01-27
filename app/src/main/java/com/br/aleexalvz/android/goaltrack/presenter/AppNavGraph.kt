@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.br.aleexalvz.android.goaltrack.presenter.components.BottomNavItem
-import com.br.aleexalvz.android.goaltrack.presenter.components.NavigationBar
+import com.br.aleexalvz.android.goaltrack.presenter.components.AppNavigationBar
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.registerFeatureHomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.login.navigation.LoginRoutes
@@ -36,17 +36,17 @@ fun AppNavGraph() {
     }
 
     val bottomNavigationItems = listOf(
-        BottomNavItem("Goals", HomeRoutes.Goals, Icons.Outlined.TaskAlt),
-        BottomNavItem("Actions", HomeRoutes.Actions, Icons.Outlined.Home),
-        BottomNavItem("Calendar", HomeRoutes.Calendar, Icons.Outlined.CalendarMonth),
-        BottomNavItem("Friends", HomeRoutes.Friends, Icons.Outlined.Construction),
+        BottomNavItem("Goals", HomeRoutes.HOME_SCREEN, Icons.Outlined.TaskAlt),
+        BottomNavItem("Actions", HomeRoutes.ACTIONS, Icons.Outlined.Home),
+        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Outlined.CalendarMonth),
+        BottomNavItem("Friends", HomeRoutes.FRIENDS, Icons.Outlined.Construction),
     )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
             if (shouldShowNavigationBar(currentScreen.value)) {
-                NavigationBar(navController, bottomNavigationItems, HomeRoutes.Home)
+                AppNavigationBar(navController, bottomNavigationItems, HomeRoutes.HOME_GRAPH)
             }
         }
     ) { innerPadding ->

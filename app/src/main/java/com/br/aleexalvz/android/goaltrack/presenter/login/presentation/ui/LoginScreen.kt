@@ -57,7 +57,7 @@ fun LoginScreen(
 
     LoginEventHandler(
         loginViewModel = loginViewModel,
-        onLoginSuccess = { navController.navigate(HomeRoutes.Home) }
+        onLoginSuccess = { navController.navigate(HomeRoutes.HOME_GRAPH) }
     )
 
     LoginContent(
