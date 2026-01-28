@@ -14,7 +14,7 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError.Unknow
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
-import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
+import com.br.aleexalvz.android.goaltrack.domain.usecase.LoginUseCase
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.LoginAction
@@ -34,7 +34,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -76,7 +76,7 @@ class LoginViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true) }
 
             val response = withContext(IO) {
-                authRepository.login(
+                loginUseCase(
                     LoginModel(
                         email = state.value.email,
                         password = state.value.password

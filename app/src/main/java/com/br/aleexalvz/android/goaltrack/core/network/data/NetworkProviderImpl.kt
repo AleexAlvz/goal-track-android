@@ -7,7 +7,7 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkHeaders
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.data.AuthManager
+import com.br.aleexalvz.android.goaltrack.data.session.SessionManager
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import okhttp3.Headers
@@ -109,7 +109,7 @@ class NetworkProviderImpl @Inject constructor(
     }.build()
 
     private fun Headers.Builder.addAuthToken() {
-        AuthManager.getAuthToken().takeIf { !it.isNullOrBlank() }.let {
+        SessionManager.getAuthToken().takeIf { !it.isNullOrBlank() }.let {
             add(NetworkHeaders.AUTHORIZATION, "Bearer $it")
         }
     }

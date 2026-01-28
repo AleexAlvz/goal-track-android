@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -142,10 +141,26 @@ fun SignupContent(
             errorMessage = state.emailError
         )
 
+        DefaultOutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            text = state.fullName,
+            onValueChange = { onUIAction(SignUpAction.UpdateFullName(it)) },
+            labelText = "Nome completo",
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Person,
+                    contentDescription = "Nome completo"
+                )
+            },
+            errorMessage = state.fullNameError
+        )
+
         PasswordOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = 8.dp),
             text = state.password,
             onValueChange = { onUIAction(SignUpAction.UpdatePassword(it)) },
             labelText = "Senha",
@@ -156,7 +171,7 @@ fun SignupContent(
         PasswordOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = 8.dp),
             text = state.confirmPassword,
             onValueChange = { onUIAction(SignUpAction.UpdateConfirmPassword(it)) },
             labelText = "Confirme sua senha",

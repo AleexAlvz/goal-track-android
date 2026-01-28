@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option java_package = "com.br.aleexalvz.goaltrack.datastore";
+option java_multiple_files = true;
+
+message SessionProto {
+  string encrypted_auth_token = 1;
+  string encrypted_email = 2;
+  string encrypted_fullname = 3;
+}

@@ -11,6 +11,7 @@ import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateConfirmPassword
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail
+import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validatePassword
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpAction
 import com.br.aleexalvz.android.goaltrack.presenter.login.presentation.model.SignUpEvent
@@ -42,6 +43,9 @@ class SignUpViewModel @Inject constructor(
             is SignUpAction.UpdateEmail ->
                 _state.update { it.copy(email = action.email) }
 
+            is SignUpAction.UpdateFullName ->
+                _state.update { it.copy(fullName = action.fullName) }
+
             is SignUpAction.UpdatePassword ->
                 _state.update { it.copy(password = action.password) }
 
@@ -62,6 +66,7 @@ class SignUpViewModel @Inject constructor(
                 authRepository.signUp(
                     SignupModel(
                         email = state.value.email,
+                        fullName= state.value.fullName,
                         password = state.value.password,
                         confirmPassword = state.value.confirmPassword,
                     )
@@ -96,15 +101,21 @@ class SignUpViewModel @Inject constructor(
 
     private fun validateFields(): Unit = with(state.value) {
         val emailResult = email.validateEmail()
+        val fullNameResult = fullName.validateIsNotBlank()
         val passwordResult = password.validatePassword()
         val confirmPasswordResult = confirmPassword.validateConfirmPassword(password)
 
-        _state.update { it.copy(emailError = emailResult.exceptionOrNull()?.message) }
-        _state.update { it.copy(passwordError = passwordResult.exceptionOrNull()?.message) }
-        _state.update { it.copy(confirmPasswordError = confirmPasswordResult.exceptionOrNull()?.message) }
+        _state.update {
+            it.copy(
+                emailError = emailResult.exceptionOrNull()?.message,
+                fullNameError = fullNameResult.exceptionOrNull()?.message,
+                passwordError = passwordResult.exceptionOrNull()?.message,
+                confirmPasswordError = confirmPasswordResult.exceptionOrNull()?.message
+            )
+        }
     }
 
     private fun hasValidFields() = with(state.value) {
-        emailError.isNullOrBlank() && passwordError.isNullOrBlank() && confirmPasswordError.isNullOrBlank()
+        emailError.isNullOrBlank() && fullNameError.isNullOrBlank() && passwordError.isNullOrBlank() && confirmPasswordError.isNullOrBlank()
     }
 }
