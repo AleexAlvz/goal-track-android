@@ -25,14 +25,15 @@ class HomeViewModel @Inject constructor(
 
     fun getHome() = viewModelScope.launch(IO) {
 
-        val homeModel = homeRepository.getHome()
-
-        _state.update {
-            it.copy(
-                goalStatusCardState = homeModel.goalStatusCardModel.getGoalStatusCardState()
-            )
+        homeRepository.getHome().getOrNull()?.let { home ->
+            _state.update {
+                it.copy(
+                    goalStatusCardState = home.goalStatusCardModel.getGoalStatusCardState()
+                )
+            }
         }
     }
+
 
     private fun GoalStatusCardModel.getGoalStatusCardState(): GoalStatusCardState =
         if (goalsInProgress >= 1) {

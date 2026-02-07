@@ -7,6 +7,10 @@ object LoginEndpoints {
     const val RECOVERY_PASSWORD_ENDPOINT = "auth/recoveryPassword"
 }
 
+object HomeEndpoints {
+    const val HOME_ENDPOINT = "home"
+}
+
 object GoalEndpoints {
 
 }
