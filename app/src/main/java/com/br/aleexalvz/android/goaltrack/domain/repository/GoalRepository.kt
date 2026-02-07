@@ -1,7 +1,7 @@
 package com.br.aleexalvz.android.goaltrack.domain.repository
 
-import com.br.aleexalvz.android.goaltrack.domain.model.GoalModel
-import com.br.aleexalvz.android.goaltrack.domain.model.GoalStatusEnum
+import com.br.aleexalvz.android.goaltrack.domain.model.Goal.GoalModel
+import com.br.aleexalvz.android.goaltrack.domain.model.Goal.GoalStatusEnum
 
 interface GoalRepository {
 

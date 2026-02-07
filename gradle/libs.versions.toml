@@ -19,6 +19,7 @@ kotlin-serialization = "1.6.3"
 androidx-datastore = "1.1.1"
 protobuf-javalite = "3.25.3"
 plugin-protobuf = "0.9.6"
+androidx-core-splashscreen = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,7 @@ dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", vers
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidx-hilt-navigation-compose" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger-hilt-android" }
 androidx-hilt-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.ref = "androidx-hilt-compiler" }
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-core-splashscreen" }
 
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttp-bom" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }

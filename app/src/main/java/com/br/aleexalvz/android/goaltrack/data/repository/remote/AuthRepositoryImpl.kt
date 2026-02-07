@@ -1,23 +1,23 @@
-package com.br.aleexalvz.android.goaltrack.data.repository
+package com.br.aleexalvz.android.goaltrack.data.repository.remote
 
 import com.br.aleexalvz.android.goaltrack.core.common.JsonHelper
 import com.br.aleexalvz.android.goaltrack.core.network.domain.NetworkProvider
-import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkMethod
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
 import com.br.aleexalvz.android.goaltrack.data.mapper.toData
 import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.LOGIN_ENDPOINT
 import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.RECOVERY_PASSWORD_ENDPOINT
+import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.REFRESH_ENDPOINT
 import com.br.aleexalvz.android.goaltrack.data.model.LoginEndpoints.SIGNUP_ENDPOINT
 import com.br.aleexalvz.android.goaltrack.data.model.dto.LoginDTO
 import com.br.aleexalvz.android.goaltrack.data.model.dto.RecoveryPasswordDTO
+import com.br.aleexalvz.android.goaltrack.data.model.dto.RefreshSessionDTO
 import com.br.aleexalvz.android.goaltrack.data.model.dto.SignupDTO
 import com.br.aleexalvz.android.goaltrack.data.model.response.LoginResponse
-import com.br.aleexalvz.android.goaltrack.data.session.SessionManager
-import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
-import com.br.aleexalvz.android.goaltrack.domain.model.RecoveryPasswordModel
-import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
+import com.br.aleexalvz.android.goaltrack.domain.model.login.LoginModel
+import com.br.aleexalvz.android.goaltrack.domain.model.login.RecoveryPasswordModel
+import com.br.aleexalvz.android.goaltrack.domain.model.login.SignupModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
 import javax.inject.Inject
 
@@ -55,8 +55,24 @@ class AuthRepositoryImpl @Inject constructor(
                     bodyJson = jsonBody
                 )
             )
+            return response
+        } catch (error: Exception) {
+            return NetworkResponse.Failure(error)
+        }
+    }
 
-            response.onSuccess { SessionManager.clearSession() }
+    override suspend fun refreshSession(refreshToken: String): NetworkResponse<LoginResponse> {
+        try {
+            val body = RefreshSessionDTO(refreshToken)
+            val jsonBody = JsonHelper.toJson(body, RefreshSessionDTO.serializer())
+            val response = networkProvider.request(
+                networkRequest = NetworkRequest(
+                    endpoint = REFRESH_ENDPOINT,
+                    method = NetworkMethod.POST,
+                    bodyJson = jsonBody
+                ),
+                responseSerializer = LoginResponse.serializer()
+            )
             return response
         } catch (error: Exception) {
             return NetworkResponse.Failure(error)
@@ -74,7 +90,6 @@ class AuthRepositoryImpl @Inject constructor(
                     bodyJson = jsonBody
                 )
             )
-
             return response
         } catch (error: Exception) {
             return NetworkResponse.Failure(error)

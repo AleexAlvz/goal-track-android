@@ -7,7 +7,7 @@ import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.domain.model.SignupModel
+import com.br.aleexalvz.android.goaltrack.domain.model.login.SignupModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateConfirmPassword
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail

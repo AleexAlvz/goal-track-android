@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.domain.model
+package com.br.aleexalvz.android.goaltrack.domain.model.action
 
 enum class GoalActionStatusEnum {
     IN_PROGRESS,

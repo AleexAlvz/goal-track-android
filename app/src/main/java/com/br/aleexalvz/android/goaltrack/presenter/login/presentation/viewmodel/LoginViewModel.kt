@@ -13,7 +13,7 @@ import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError.Unexpe
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError.Unknown
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.domain.model.LoginModel
+import com.br.aleexalvz.android.goaltrack.domain.model.login.LoginModel
 import com.br.aleexalvz.android.goaltrack.domain.usecase.LoginUseCase
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateEmail
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
@@ -77,10 +77,11 @@ class LoginViewModel @Inject constructor(
 
             val response = withContext(IO) {
                 loginUseCase(
-                    LoginModel(
+                    loginModel = LoginModel(
                         email = state.value.email,
                         password = state.value.password
-                    )
+                    ),
+                    persistSession = state.value.rememberMe
                 )
             }
             handleLoginResponse(response)

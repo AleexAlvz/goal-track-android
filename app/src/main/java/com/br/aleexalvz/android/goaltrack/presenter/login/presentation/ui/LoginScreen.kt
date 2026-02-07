@@ -1,13 +1,17 @@
 package com.br.aleexalvz.android.goaltrack.presenter.login.presentation.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
@@ -15,6 +19,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.br.aleexalvz.android.goaltrack.R
+import com.br.aleexalvz.android.goaltrack.presenter.components.button.CheckBox
 import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.DefaultOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.PasswordOutlinedTextField
@@ -64,7 +72,8 @@ fun LoginScreen(
         modifier = modifier,
         loginState = loginState,
         onUIAction = loginViewModel::onUIAction,
-        onSignupClickListener = { navController.navigate(LoginRoutes.SIGN_UP) }
+        onSignupClickListener = { navController.navigate(LoginRoutes.SIGN_UP) },
+        onRecoveryPasswordClickListener = { navController.navigate(LoginRoutes.RECOVERY_PASSWORD) }
     )
 }
 
@@ -73,7 +82,8 @@ fun LoginContent(
     modifier: Modifier = Modifier,
     loginState: LoginState,
     onUIAction: ((LoginAction) -> Unit),
-    onSignupClickListener: (() -> Unit)
+    onSignupClickListener: (() -> Unit),
+    onRecoveryPasswordClickListener: (() -> Unit)
 ) {
     Column(
         modifier = modifier
@@ -82,18 +92,40 @@ fun LoginContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        Surface(
+            modifier = Modifier
+                .padding(top = 80.dp)
+                .size(96.dp),
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.primary,
+            shadowElevation = 8.dp
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = "App icon",
+                modifier = Modifier.padding(8.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
         Text(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 32.dp),
+            text = "Goal track",
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 12.dp),
             textAlign = TextAlign.Center,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            text = stringResource(R.string.welcome)
+            fontSize = 16.sp,
+            text = stringResource(R.string.app_login_subtitle)
         )
 
         DefaultOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = 40.dp),
             text = loginState.email,
             onValueChange = { onUIAction(LoginAction.UpdateEmail(it)) },
             labelText = stringResource(R.string.email),
@@ -109,21 +141,48 @@ fun LoginContent(
         PasswordOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = 16.dp),
             text = loginState.password,
             onValueChange = { onUIAction(LoginAction.UpdatePassword(it)) },
             labelText = stringResource(R.string.password),
             contentDescription = stringResource(R.string.password),
             errorMessage = loginState.passwordError,
             onImeAction = { onUIAction(LoginAction.Submit) }
-
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CheckBox(
+                modifier = Modifier.padding(start = 8.dp),
+                horizontalAlignment = Arrangement.Start,
+                selected = loginState.rememberMe,
+                onStateChanged = { onUIAction(LoginAction.UpdateRememberMeCheckBox(it)) },
+                text = "Lembrar de mim",
+                textSize = 14.sp
+            )
+
+            Text(
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .clickable { onRecoveryPasswordClickListener() },
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                text = "Recuperar senha",
+                fontSize = 14.sp,
+                textDecoration = TextDecoration.Underline
+            )
+        }
 
         Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 12.dp),
+                .padding(top = 18.dp),
             onClick = {
                 onUIAction(LoginAction.Submit)
             },
@@ -206,7 +265,8 @@ private fun LoginEventHandler(
                 is LoginEvent.InvalidCredentials -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.invalid_credentials_error_title)
-                    dialogMessage = context.getString(R.string.invalid_credentials_error_message)
+                    dialogMessage =
+                        context.getString(R.string.invalid_credentials_error_message)
                 }
 
                 LoginEvent.ConnectionError -> {
@@ -247,6 +307,7 @@ fun LoginScreenPreview() {
             passwordError = null
         ),
         onUIAction = {},
-        onSignupClickListener = {}
+        onSignupClickListener = {},
+        onRecoveryPasswordClickListener = {}
     )
 }

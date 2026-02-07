@@ -72,6 +72,8 @@ fun DefaultOutlinedTextField(
         leadingIcon = leadingIcon,
         readOnly = readOnly ?: false,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-//        colors = defaultTextFieldColor(),
+//        colors = TextFieldColors( TODO mudar cor
+//
+//        ),
     )
 }

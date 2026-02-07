@@ -1,10 +1,11 @@
 package com.br.aleexalvz.android.goaltrack.presenter.components
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Construction
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,11 +43,11 @@ fun AppNavigationBar(
         items.forEach { item ->
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    indicatorColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    indicatorColor = MaterialTheme.colorScheme.background
                 ),
                 selected = item.route == backStackEntry.value?.destination?.route,
                 onClick = {
@@ -65,14 +66,23 @@ fun AppNavigationBar(
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview(showSystemUi = true)
+@Preview(
+    name = "Light",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    showBackground = true
+)
+@Preview(
+    name = "Dark",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
 @Composable
 fun NavigationBarPreview() {
     val bottomNavigationItems = listOf(
-        BottomNavItem("Goals", HomeRoutes.HOME_SCREEN, Icons.Outlined.TaskAlt),
-        BottomNavItem("Actions", HomeRoutes.ACTIONS, Icons.Outlined.Home),
+        BottomNavItem("Home", HomeRoutes.HOME_SCREEN, Icons.Outlined.TaskAlt),
         BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Outlined.CalendarMonth),
         BottomNavItem("Friends", HomeRoutes.FRIENDS, Icons.Outlined.Construction),
+        BottomNavItem("Settings", HomeRoutes.SETTINGS, Icons.Outlined.Settings),
     )
     Scaffold(bottomBar = {
         AppNavigationBar(
@@ -81,5 +91,4 @@ fun NavigationBarPreview() {
             popUpToRoute = null
         )
     }) {}
-
 }

@@ -48,8 +48,9 @@ fun CheckBox(
         horizontalArrangement = horizontalAlignment
     ) {
         val checkBoxColors = CheckboxDefaults.colors(
-            checkedColor = MaterialTheme.colorScheme.surface,
-            checkmarkColor = MaterialTheme.colorScheme.primary,
+            checkedColor = MaterialTheme.colorScheme.primary,
+            checkmarkColor = MaterialTheme.colorScheme.surface,
+            uncheckedColor = MaterialTheme.colorScheme.primary,
         )
 
         Checkbox(
@@ -66,18 +67,28 @@ fun CheckBox(
                 modifier = Modifier.padding(start = 4.dp),
                 text = text,
                 fontSize = textSize,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center
             )
         }
     }
 }
 
-@Preview
+@Preview(name = "Checked", showBackground = true)
 @Composable
-private fun CheckBoxPreview() {
+private fun CheckedBoxPreview() {
     CheckBox(
         selected = true,
+        onStateChanged = {},
+        text = "Check box text"
+    )
+}
+
+@Preview(name = "Unchecked", showBackground = true)
+@Composable
+private fun UncheckedBoxPreview() {
+    CheckBox(
+        selected = false,
         onStateChanged = {},
         text = "Check box text"
     )

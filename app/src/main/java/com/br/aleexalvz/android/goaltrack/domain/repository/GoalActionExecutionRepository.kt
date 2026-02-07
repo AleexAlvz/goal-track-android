@@ -1,6 +1,6 @@
 package com.br.aleexalvz.android.goaltrack.domain.repository
 
-import com.br.aleexalvz.android.goaltrack.domain.model.ActionExecutionModel
+import com.br.aleexalvz.android.goaltrack.domain.model.execution.ActionExecutionModel
 import java.time.YearMonth
 
 interface GoalActionExecutionRepository {

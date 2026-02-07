@@ -1,6 +1,6 @@
 package com.br.aleexalvz.android.goaltrack.domain.repository
 
-import com.br.aleexalvz.android.goaltrack.domain.model.GoalActionModel
+import com.br.aleexalvz.android.goaltrack.domain.model.action.GoalActionModel
 
 interface GoalActionRepository {
     suspend fun getActionsByGoal(goalId: Long): List<GoalActionModel>

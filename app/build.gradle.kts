@@ -60,8 +60,6 @@ protobuf {
     }
 }
 
-
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -85,6 +83,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp)
+    implementation(libs.androidx.core.splashscreen)
 
     //Kotlin serialization
     implementation(libs.kotlin.serialization)

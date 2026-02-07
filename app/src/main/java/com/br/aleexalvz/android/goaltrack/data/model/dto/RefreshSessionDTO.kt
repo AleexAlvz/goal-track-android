@@ -1,0 +1,8 @@
+package com.br.aleexalvz.android.goaltrack.data.model.dto
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class RefreshSessionDTO(
+    val refreshToken: String
+)

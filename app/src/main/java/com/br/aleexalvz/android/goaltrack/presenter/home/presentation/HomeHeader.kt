@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun HomeHeader(modifier: Modifier = Modifier) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()

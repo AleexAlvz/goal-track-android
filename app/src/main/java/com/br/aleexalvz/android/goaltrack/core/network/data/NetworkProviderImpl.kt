@@ -109,7 +109,7 @@ class NetworkProviderImpl @Inject constructor(
     }.build()
 
     private fun Headers.Builder.addAuthToken() {
-        SessionManager.getAuthToken().takeIf { !it.isNullOrBlank() }.let {
+        SessionManager.session?.authToken.takeIf { !it.isNullOrBlank() }.let {
             add(NetworkHeaders.AUTHORIZATION, "Bearer $it")
         }
     }

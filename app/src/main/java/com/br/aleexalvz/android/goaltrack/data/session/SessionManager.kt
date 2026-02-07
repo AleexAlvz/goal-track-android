@@ -1,16 +1,23 @@
 package com.br.aleexalvz.android.goaltrack.data.session
 
-import com.br.aleexalvz.android.goaltrack.domain.model.Session
+import com.br.aleexalvz.android.goaltrack.domain.model.login.Session
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 object SessionManager {
-    private var session: Session? = null
+    var session: Session? = null
+        private set
 
-    fun getAuthToken(): String? = session?.authToken
+    private val _expiredSessionEvent = MutableSharedFlow<Boolean>()
+    val expiredSessionEvent = _expiredSessionEvent.asSharedFlow()
 
-    fun isSessionValid(): Boolean = !session?.authToken.isNullOrBlank()
+    fun saveSession(newSession: Session) {
+        session = newSession
+    }
 
-    fun saveSession(newSession: Session) { session = newSession }
+    fun clearSession() {
+        session = null
+    }
 
-    fun clearSession() { session = null }
-
+    suspend fun notifiesExpiredSession() = _expiredSessionEvent.emit(true)
 }
