@@ -15,4 +15,9 @@
     <string name="unexpected_error_title">Erro inesperado</string>
     <string name="unexpected_error_message">Ocorreu um erro inesperado. Tente novamente mais tarde.</string>
     <string name="signup_with_success">Conta criada com sucesso!</string>
+    <string name="goal_status_in_progress">Em progresso</string>
+    <string name="goal_status_finished">Finalizada</string>
+    <string name="goal_status_canceled">Cancelada</string>
+    <string name="form_dialog_message_missing_required_fields">Revise todos os campos obrigatórios para poder salvar</string>
+    <string name="form_dialog_title_generic_failure">Falha no formulário</string>
 </resources>

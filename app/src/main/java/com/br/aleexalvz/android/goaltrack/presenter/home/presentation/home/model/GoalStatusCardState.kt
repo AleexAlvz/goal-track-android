@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.model
+package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.model
 
 sealed interface GoalStatusCardState {
     data object Loading: GoalStatusCardState

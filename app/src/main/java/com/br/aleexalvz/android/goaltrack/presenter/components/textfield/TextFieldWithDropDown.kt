@@ -24,6 +24,7 @@ fun TextFieldWithDropDown(
     dropDownValues: List<String>,
     text: String = "",
     labelText: String = "",
+    errorMessage: String? = null,
     onSelectedItem: ((String) -> Unit)? = null
 ) {
     val expanded = remember {
@@ -36,10 +37,13 @@ fun TextFieldWithDropDown(
         onExpandedChange = { expanded.value = !expanded.value }
     ) {
         DefaultOutlinedTextField(
-            modifier = Modifier.menuAnchor().fillMaxWidth(),
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
             text = text,
             onValueChange = {},
             labelText = labelText,
+            errorMessage = errorMessage,
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(
                     expanded = expanded.value

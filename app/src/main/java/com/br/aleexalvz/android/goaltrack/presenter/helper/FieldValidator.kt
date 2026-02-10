@@ -34,9 +34,9 @@ fun String.validateConfirmPassword(password: String): Result<Unit> =
         else -> Result.success(Unit)
     }
 
-fun String.validateIsNotBlank(): Result<Unit> =
+fun String?.validateIsNotBlank(): Result<Unit> =
     when {
-        this.isBlank() -> Result.failure(InvalidFieldException("O campo deve ser preenchido"))
+        this.isNullOrBlank() -> Result.failure(InvalidFieldException("O campo deve ser preenchido"))
         else -> Result.success(Unit)
     }
 

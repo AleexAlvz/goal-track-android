@@ -3,10 +3,10 @@ package com.br.aleexalvz.android.goaltrack.presenter.components
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Construction
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.TaskAlt
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -37,9 +37,7 @@ fun AppNavigationBar(
 
     val backStackEntry = navController.currentBackStackEntryAsState()
 
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.background
-    ) {
+    NavigationBar {
         items.forEach { item ->
             NavigationBarItem(
                 colors = NavigationBarItemDefaults.colors(
@@ -79,10 +77,10 @@ fun AppNavigationBar(
 @Composable
 fun NavigationBarPreview() {
     val bottomNavigationItems = listOf(
-        BottomNavItem("Home", HomeRoutes.HOME_SCREEN, Icons.Outlined.TaskAlt),
-        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Outlined.CalendarMonth),
-        BottomNavItem("Friends", HomeRoutes.FRIENDS, Icons.Outlined.Construction),
-        BottomNavItem("Settings", HomeRoutes.SETTINGS, Icons.Outlined.Settings),
+        BottomNavItem("Home", HomeRoutes.HOME_SCREEN, Icons.Filled.Home),
+        BottomNavItem("Goals", HomeRoutes.GOALS, Icons.Filled.Flag),
+        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Filled.CalendarMonth),
+        BottomNavItem("Settings", HomeRoutes.SETTINGS, Icons.Filled.Settings)
     )
     Scaffold(bottomBar = {
         AppNavigationBar(

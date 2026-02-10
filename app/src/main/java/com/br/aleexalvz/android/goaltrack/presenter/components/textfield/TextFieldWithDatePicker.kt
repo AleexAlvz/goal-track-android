@@ -31,16 +31,16 @@ fun TextFieldWithDatePicker(
     val datePickerState = rememberDatePickerState()
 
     DefaultOutlinedTextField(
-        text = text,
-        onValueChange = {},
-        labelText = labelText,
-        readOnly = true,
         modifier = modifier.onFocusChanged {
             if (it.isFocused) {
                 showDatePickerDialog = true
                 focusManager.clearFocus(force = true)
             }
-        }
+        },
+        text = text,
+        onValueChange = {},
+        labelText = labelText,
+        readOnly = true
     )
 
     if (showDatePickerDialog) {

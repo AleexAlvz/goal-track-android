@@ -12,7 +12,7 @@ object LightThemeColors {
     val SecondaryColor = Color(0xFFE8EDF5)
     val OnSecondaryColor = Color.Black
 
-    val SurfaceColor = Color(0xFFE5E5E5)
+    val SurfaceColor = Color.White
     val OnSurfaceColor = Color.Black
     val OnSurfaceVariantColor = Color(0xFF4A739C)
 }

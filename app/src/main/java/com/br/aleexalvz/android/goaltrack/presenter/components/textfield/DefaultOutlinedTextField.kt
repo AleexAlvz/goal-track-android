@@ -21,9 +21,9 @@ fun DefaultOutlinedTextField(
     modifier: Modifier = Modifier,
     text: String,
     onValueChange: (String) -> Unit,
-    labelText: String,
-    leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null,
+    labelText: String? = null,
+    leadingIcon: @Composable() (() -> Unit)? = null,
+    trailingIcon: @Composable() (() -> Unit)? = null,
     errorMessage: String? = null,
     prefix: String? = null,
     readOnly: Boolean? = false,
@@ -64,16 +64,15 @@ fun DefaultOutlinedTextField(
         },
         singleLine = true,
         label = {
-            Text(
-                text = labelText,
-                fontSize = 14.sp,
-            )
+            labelText?.let {
+                Text(
+                    text = labelText,
+                    fontSize = 14.sp,
+                )
+            }
         },
         leadingIcon = leadingIcon,
         readOnly = readOnly ?: false,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-//        colors = TextFieldColors( TODO mudar cor
-//
-//        ),
     )
 }

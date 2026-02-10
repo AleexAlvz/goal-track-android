@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.home.presentation
+package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

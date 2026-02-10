@@ -29,6 +29,5 @@ class HomeRepositoryImpl @Inject constructor(
                 )
             )
         } ?: Result.failure(Exception())
-
     }
 }

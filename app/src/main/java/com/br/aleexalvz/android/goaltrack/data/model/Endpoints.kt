@@ -12,7 +12,8 @@ object HomeEndpoints {
 }
 
 object GoalEndpoints {
-
+    const val GOALS_ENDPOINT = "goals"
+    const val GET_GOAL_BY_ID = "goals/{goalId}"
 }
 
 object GoalActionEndpoints {

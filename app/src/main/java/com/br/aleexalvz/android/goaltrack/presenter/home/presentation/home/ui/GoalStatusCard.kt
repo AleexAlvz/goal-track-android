@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.home.presentation
+package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.model.GoalStatusCardState
+import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.model.GoalStatusCardState
 
 @Composable
 fun GoalStatusCard(

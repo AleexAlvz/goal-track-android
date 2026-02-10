@@ -1,5 +1,8 @@
 package com.br.aleexalvz.android.goaltrack.data.model.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GoalDTO(
     val id: Long,
     val title: String,

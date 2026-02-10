@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.home.presentation
+package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +11,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
-import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.model.HomeState
-import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.viewmodel.HomeViewModel
+import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.model.HomeState
+import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.home.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
@@ -28,7 +28,7 @@ fun HomeScreen(
             navController.navigate(HomeRoutes.GOALS)
         },
         onNavigateToCreateGoal = {
-            navController.navigate(HomeRoutes.CREATE_GOAL)
+            navController.navigate(HomeRoutes.GOAL_FORM)
         }
     )
 }
