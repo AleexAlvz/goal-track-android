@@ -16,8 +16,8 @@ private val LightTheme = lightColorScheme(
     surface = LightThemeColors.SurfaceColor,
     onSurface = LightThemeColors.OnSurfaceColor,
     onSurfaceVariant = LightThemeColors.OnSurfaceVariantColor,
-    primaryContainer = LightThemeColors.PrimaryColor,
-    onPrimaryContainer = LightThemeColors.OnPrimaryColor,
+    primaryContainer = LightThemeColors.PrimaryContainer,
+    onPrimaryContainer = LightThemeColors.OnPrimaryContainer,
 )
 
 private val DarkTheme = lightColorScheme(
@@ -31,8 +31,8 @@ private val DarkTheme = lightColorScheme(
     surface = DarkThemeColors.SurfaceColor,
     onSurface = DarkThemeColors.OnSurfaceColor,
     onSurfaceVariant = DarkThemeColors.OnSurfaceVariantColor,
-    primaryContainer = DarkThemeColors.PrimaryColor,
-    onPrimaryContainer = DarkThemeColors.OnPrimaryColor
+    primaryContainer = DarkThemeColors.PrimaryContainer,
+    onPrimaryContainer = DarkThemeColors.OnPrimaryContainer
 )
 
 @Composable

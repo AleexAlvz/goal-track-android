@@ -1,6 +1,7 @@
 package com.br.aleexalvz.android.goaltrack.presenter.home.presentation.goal.ui
 
 import android.content.Context
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -44,6 +45,7 @@ import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.goalDetailWithId
 import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.goal.model.GoalState
 import com.br.aleexalvz.android.goaltrack.presenter.home.presentation.goal.viewmodel.GoalViewModel
+import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
 import java.time.LocalDate
 
 @Composable
@@ -56,7 +58,7 @@ fun GoalsScreen(
 
     GoalsContent(
         goalState = state,
-        onNavigateToCreateGoal = { navController.navigate(HomeRoutes.GOAL_FORM_FULL_ROUTE) },
+        onNavigateToCreateGoal = { navController.navigate(HomeRoutes.goalFormCreateMode()) },
         onNavigateToGoalDetail = { goalId -> navController.navigate(goalDetailWithId(goalId)) }
     )
 }
@@ -97,12 +99,16 @@ fun GoalsContent(
             // TODO Filtros
 
             Card(
-                Modifier.padding(16.dp),
-                colors = CardColors(
+                Modifier
+                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                        shape = CardDefaults.shape
+                    ),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     contentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 LazyColumn {
@@ -117,7 +123,7 @@ fun GoalsContent(
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 thickness = 1.dp,
-                                MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                                MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
                             )
                         }
                     }
@@ -200,28 +206,60 @@ private fun getGoalStatusMessage(context: Context, goalModel: GoalModel): String
 
 @Preview(name = "Light", showBackground = true)
 @Composable
-fun GoalsScreenPreview() {
-    GoalsContent(
-        goalState = GoalState(
-            goals = mutableListOf<GoalModel>().apply {
-                repeat(5) { index ->
-                    add(
-                        GoalModel(
-                            id = 0,
-                            title = "Title $index",
-                            description = "Description $index",
-                            category = GoalCategoryEnum.CAREER,
-                            creationDate = LocalDate.now(),
-                            endDate = null,
-                            status = GoalStatusEnum.IN_PROGRESS
+fun GoalsScreenPreviewLight() {
+    GoalTrackTheme {
+        GoalsContent(
+            goalState = GoalState(
+                goals = mutableListOf<GoalModel>().apply {
+                    repeat(5) { index ->
+                        add(
+                            GoalModel(
+                                id = 0,
+                                title = "Title $index",
+                                description = "Description $index",
+                                category = GoalCategoryEnum.CAREER,
+                                creationDate = LocalDate.now(),
+                                endDate = null,
+                                status = GoalStatusEnum.IN_PROGRESS
+                            )
                         )
-                    )
-                }
-            },
-            isLoading = false,
-            error = null
-        ),
-        onNavigateToCreateGoal = { },
-        onNavigateToGoalDetail = { }
-    )
+                    }
+                },
+                isLoading = false,
+                error = null
+            ),
+            onNavigateToCreateGoal = { },
+            onNavigateToGoalDetail = { }
+        )
+    }
+}
+
+@Preview(name = "Dark", showSystemUi = true)
+@Composable
+fun GoalsScreenPreviewDark() {
+    GoalTrackTheme(darkTheme = true) {
+        GoalsContent(
+            goalState = GoalState(
+                goals = mutableListOf<GoalModel>().apply {
+                    repeat(5) { index ->
+                        add(
+                            GoalModel(
+                                id = 0,
+                                title = "Title $index",
+                                description = "Description $index",
+                                category = GoalCategoryEnum.CAREER,
+                                creationDate = LocalDate.now(),
+                                endDate = null,
+                                status = GoalStatusEnum.IN_PROGRESS
+                            )
+                        )
+                    }
+                },
+                isLoading = false,
+                error = null
+            ),
+            onNavigateToCreateGoal = { },
+            onNavigateToGoalDetail = { }
+        )
+    }
 }

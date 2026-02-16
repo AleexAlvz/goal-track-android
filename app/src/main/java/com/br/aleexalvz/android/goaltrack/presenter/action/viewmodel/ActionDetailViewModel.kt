@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel
+package com.br.aleexalvz.android.goaltrack.presenter.action.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -7,10 +7,10 @@ import com.br.aleexalvz.android.goaltrack.core.network.extension.onFailure
 import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.core.network.model.getOrNull
 import com.br.aleexalvz.android.goaltrack.data.model.response.toActionModel
-import com.br.aleexalvz.android.goaltrack.data.model.response.toGoalModel
+import com.br.aleexalvz.android.goaltrack.data.model.response.toNoteModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.ActionRepository
-import com.br.aleexalvz.android.goaltrack.domain.repository.GoalRepository
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalDetailState
+import com.br.aleexalvz.android.goaltrack.domain.repository.NoteRepository
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
@@ -21,54 +21,54 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GoalDetailViewModel @Inject constructor(
-    private val goalRepository: GoalRepository,
+class ActionDetailViewModel @Inject constructor(
     private val actionRepository: ActionRepository,
+    private val noteRepository: NoteRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _goal = MutableStateFlow(GoalDetailState())
-    val goal = _goal.asStateFlow()
+    private val _state = MutableStateFlow(ActionDetailState())
+    val state = _state.asStateFlow()
 
     init {
-        val goalId: Long? = savedStateHandle[HomeRoutes.GOAL_ID_ARG]
-        if (goalId != null && goalId != -1L) {
-            fetchGoalDetails(goalId)
-            fetchGoalActions(goalId)
+        val actionId: Long? = savedStateHandle[HomeRoutes.ACTION_ID_ARG]
+        if (actionId != null && actionId != -1L) {
+            fetchActionDetail(actionId)
+            fetchNotes(actionId)
         }
     }
 
-    private fun fetchGoalActions(id: Long) {
+    private fun fetchNotes(id: Long) {
         viewModelScope.launch(IO) {
             runCatching {
-                actionRepository.getActionsByGoal(id)
-                    .getOrNull()?.actions?.map { it.toActionModel() } ?: emptyList()
-            }.onSuccess { actions ->
-                _goal.update {
+                noteRepository.getNotesByAction(id)
+                    .getOrNull()?.notes?.map { it.toNoteModel() } ?: emptyList()
+            }.onSuccess { notes ->
+                _state.update {
                     it.copy(
-                        actions = actions
+                        notes = notes
                     )
                 }
             }
         }
     }
 
-    private fun fetchGoalDetails(id: Long) {
+    private fun fetchActionDetail(id: Long) {
         viewModelScope.launch(IO) {
             try {
-                goalRepository.getGoalById(id).onSuccess { goal ->
-                    _goal.update {
+                actionRepository.getActionById(id).onSuccess { action ->
+                    _state.update {
                         it.copy(
-                            goal = goal.toGoalModel(),
+                            action = action.toActionModel(),
                             isLoading = false,
                             errorToFetch = false
                         )
                     }
                 }.onFailure {
-                    _goal.update { it.copy(isLoading = false, errorToFetch = true) }
+                    _state.update { it.copy(isLoading = false, errorToFetch = true) }
                 }
             } catch (e: Exception) {
-                _goal.update { it.copy(isLoading = false, errorToFetch = true) }
+                _state.update { it.copy(isLoading = false, errorToFetch = true) }
             }
         }
     }

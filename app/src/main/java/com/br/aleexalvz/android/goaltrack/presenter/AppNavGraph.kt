@@ -24,11 +24,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.br.aleexalvz.android.goaltrack.StartDestination
+import com.br.aleexalvz.android.goaltrack.presenter.action.ui.ActionDetailScreen
+import com.br.aleexalvz.android.goaltrack.presenter.action.ui.ActionFormScreen
 import com.br.aleexalvz.android.goaltrack.presenter.components.AppNavigationBar
 import com.br.aleexalvz.android.goaltrack.presenter.components.BottomNavItem
 import com.br.aleexalvz.android.goaltrack.presenter.goal.ui.GoalDetailScreen
 import com.br.aleexalvz.android.goaltrack.presenter.goal.ui.GoalFormScreen
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
+import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.ACTION_ID_ARG
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.GOAL_ID_ARG
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.registerFeatureHomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.login.navigation.LoginRoutes
@@ -95,6 +98,34 @@ fun AppNavGraph(
                     )
                 ) {
                     GoalDetailScreen(navController)
+                }
+
+                composable(
+                    route = HomeRoutes.ACTION_FORM_FULL_ROUTE,
+                    arguments = listOf(
+                        navArgument(ACTION_ID_ARG) {
+                            type = NavType.LongType
+                            defaultValue = -1L
+                        },
+                        navArgument(GOAL_ID_ARG) {
+                            type = NavType.LongType
+                            defaultValue = -1L
+                        }
+                    )
+                ) {
+                    ActionFormScreen(navController)
+                }
+
+                composable(
+                    route = HomeRoutes.ACTION_DETAIL_FULL_ROUTE,
+                    arguments = listOf(
+                        navArgument(ACTION_ID_ARG) {
+                            type = NavType.LongType
+                            defaultValue = -1L
+                        }
+                    )
+                ) {
+                    ActionDetailScreen(navController)
                 }
             }
         }

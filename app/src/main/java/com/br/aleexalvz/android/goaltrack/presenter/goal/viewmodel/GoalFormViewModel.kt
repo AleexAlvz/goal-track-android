@@ -7,10 +7,11 @@ import com.br.aleexalvz.android.goaltrack.core.network.extension.onFailure
 import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalModel
+import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.repository.GoalRepository
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalAction
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalState
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.GOAL_ID_ARG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,7 @@ class GoalFormViewModel @Inject constructor(
     private val goalId: Long by lazy { savedStateHandle.get<Long>(GOAL_ID_ARG) ?: -1L }
     private val isEditMode = goalId != -1L
 
-    private val _state = MutableStateFlow(CreateGoalState())
+    private val _state = MutableStateFlow(GoalFormState())
     val state = _state.asStateFlow()
 
     private val _event = MutableSharedFlow<CreateGoalEvent>()
@@ -42,13 +43,13 @@ class GoalFormViewModel @Inject constructor(
     init {
         if (isEditMode) {
             viewModelScope.launch(IO) {
-                goalRepository.getGoalById(goalId).onSuccess {
+                goalRepository.getGoalById(goalId).onSuccess { goal ->
                     _state.update {
                         it.copy(
-                            id = it.id,
-                            title = it.title,
-                            description = it.description,
-                            category = it.category
+                            id = goal.id,
+                            title = goal.title,
+                            description = goal.description.orEmpty(),
+                            category = goal.category.toGoalCategoryEnum()
                         )
                     }
                 }.onFailure {
@@ -58,21 +59,21 @@ class GoalFormViewModel @Inject constructor(
         }
     }
 
-    fun onUIAction(uiAction: CreateGoalAction) {
+    fun onUIAction(uiAction: GoalFormAction) {
         when (uiAction) {
-            is CreateGoalAction.UpdateTitle -> {
+            is GoalFormAction.UpdateTitle -> {
                 updateTitle(uiAction.title)
             }
 
-            is CreateGoalAction.UpdateDescription -> {
+            is GoalFormAction.UpdateDescription -> {
                 updateDescription(uiAction.description)
             }
 
-            is CreateGoalAction.UpdateCategory -> {
+            is GoalFormAction.UpdateCategory -> {
                 updateCategory(uiAction.category)
             }
 
-            is CreateGoalAction.Submit -> {
+            is GoalFormAction.Submit -> {
                 submitGoal()
             }
         }
@@ -111,9 +112,6 @@ class GoalFormViewModel @Inject constructor(
                     _event.emit(CreateGoalEvent.UnexpectedError) //TODO validar erro do repository
                 }
             }
-        } else {
-            _state.update { it.copy(isLoading = false) }
-            _event.emit(CreateGoalEvent.InvalidParams)
         }
     }
 
@@ -131,7 +129,7 @@ class GoalFormViewModel @Inject constructor(
         _state.update { it.copy(categoryError = categoryResult.exceptionOrNull()?.message) }
     }
 
-    private fun CreateGoalState.toGoalModel() = GoalModel(
+    private fun GoalFormState.toGoalModel() = GoalModel(
         title = title,
         description = description,
         category = category!!

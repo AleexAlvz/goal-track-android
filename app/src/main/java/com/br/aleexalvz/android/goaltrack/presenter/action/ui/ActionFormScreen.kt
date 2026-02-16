@@ -1,4 +1,4 @@
-package com.br.aleexalvz.android.goaltrack.presenter.goal.ui
+package com.br.aleexalvz.android.goaltrack.presenter.action.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,49 +36,51 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.br.aleexalvz.android.goaltrack.R
-import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
-import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
+import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionFrequencyEnum
+import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
+import com.br.aleexalvz.android.goaltrack.domain.model.action.toActionFrequencyEnum
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionFormAction
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionFormEvent
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionFormState
+import com.br.aleexalvz.android.goaltrack.presenter.action.viewmodel.ActionFormViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.DefaultOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.TextFieldWithDropDown
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
-import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalFormViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 
 @Composable
-fun GoalFormScreen(
+fun ActionFormScreen(
     navController: NavController,
-    goalFormViewModel: GoalFormViewModel = hiltViewModel()
+    actionFormViewModel: ActionFormViewModel = hiltViewModel()
 ) {
+    val actionState by actionFormViewModel.state.collectAsState()
 
-    val goalState by goalFormViewModel.state.collectAsState()
-
-    GoalFormEventHandler(
-        goalFormViewModel = goalFormViewModel,
+    ActionFormEventHandler(
+        actionFormViewModel = actionFormViewModel,
         onCreateSuccessfully = {
-            navController.navigate(HomeRoutes.GOALS) {
-                popUpTo(HomeRoutes.GOAL_FORM) {
+            navController.navigate(HomeRoutes.goalDetailWithId(actionState.goalId)) {
+                popUpTo(HomeRoutes.goalDetailWithId(actionState.goalId)) {
                     inclusive = true
                 }
             }
         }
     )
 
-    GoalFormContent(
-        goalFormState = goalState,
-        onUIAction = goalFormViewModel::onUIAction,
+    ActionFormContent(
+        actionState = actionState,
+        onUIAction = actionFormViewModel::onUIAction,
         onBackClicked = { navController.popBackStack() }
     )
 }
 
 @Composable
-fun GoalFormContent(
-    goalFormState: GoalFormState,
-    onUIAction: (GoalFormAction) -> Unit,
+fun ActionFormContent(
+    actionState: ActionFormState,
+    onUIAction: (ActionFormAction) -> Unit,
     onBackClicked: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -89,11 +90,11 @@ fun GoalFormContent(
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(12.dp),
-            onClick = { onUIAction(GoalFormAction.Submit) }
+            onClick = { onUIAction(ActionFormAction.Submit) }
         ) {
             Text(
                 modifier = Modifier.padding(8.dp),
-                text = "Salvar meta",
+                text = "Salvar ação",
                 fontSize = 16.sp
             )
         }
@@ -107,27 +108,18 @@ fun GoalFormContent(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconButton(
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp),
-                onClick = { onBackClicked() },
-                colors = IconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                    disabledContainerColor = MaterialTheme.colorScheme.background,
-                    disabledContentColor = MaterialTheme.colorScheme.onBackground
-                )
+                modifier = Modifier.padding(top = 16.dp, start = 16.dp),
+                onClick = { onBackClicked() }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Voltar",
-                    tint = MaterialTheme.colorScheme.onBackground
+                    contentDescription = "Voltar"
                 )
             }
 
             Text(
-                modifier = Modifier
-                    .padding(top = 16.dp),
-                text = "Criar nova meta",
+                modifier = Modifier.padding(top = 16.dp),
+                text = "Criar nova ação",
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
@@ -149,20 +141,20 @@ fun GoalFormContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            text = goalFormState.title,
-            labelText = "Título da meta",
-            onValueChange = { onUIAction(GoalFormAction.UpdateTitle(it)) },
-            errorMessage = goalFormState.titleError
+            text = actionState.title,
+            labelText = "Título da ação",
+            onValueChange = { onUIAction(ActionFormAction.UpdateTitle(it)) },
+            errorMessage = actionState.titleError
         )
 
         DefaultOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            text = goalFormState.description,
+            text = actionState.description.orEmpty(),
             labelText = "Descrição",
-            onValueChange = { onUIAction(GoalFormAction.UpdateDescription(it)) },
-            errorMessage = goalFormState.descriptionError
+            onValueChange = { onUIAction(ActionFormAction.UpdateDescription(it)) },
+            errorMessage = actionState.descriptionError
         )
 
         TextFieldWithDropDown(
@@ -170,19 +162,17 @@ fun GoalFormContent(
                 .fillMaxWidth()
                 .heightIn(min = 120.dp)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            dropDownValues = GoalCategoryEnum.entries.map { it.name },
-            text = goalFormState.category?.name.orEmpty(),
-            errorMessage = goalFormState.categoryError,
-            labelText = "Categoria",
-            onSelectedItem = { onUIAction(GoalFormAction.UpdateCategory(it.toGoalCategoryEnum())) }
+            dropDownValues = ActionFrequencyEnum.entries.map { it.name },
+            text = actionState.frequency.getMessage(context),
+            labelText = "Frequência",
+            onSelectedItem = { onUIAction(ActionFormAction.UpdateFrequency(it.toActionFrequencyEnum())) }
         )
     }
-
 }
 
 @Composable
-fun GoalFormEventHandler(
-    goalFormViewModel: GoalFormViewModel,
+fun ActionFormEventHandler(
+    actionFormViewModel: ActionFormViewModel,
     onCreateSuccessfully: () -> Unit
 ) {
     val context = LocalContext.current
@@ -190,25 +180,24 @@ fun GoalFormEventHandler(
     var dialogMessage by remember { mutableStateOf("") }
     var dialogTitle by remember { mutableStateOf("") }
 
-    LaunchedEffect(goalFormViewModel) {
-        goalFormViewModel.event.collect { event ->
+    LaunchedEffect(actionFormViewModel) {
+        actionFormViewModel.event.collect { event ->
             when (event) {
-                CreateGoalEvent.Created -> onCreateSuccessfully()
-
-                CreateGoalEvent.ConnectionError -> {
+                is ActionFormEvent.Created -> onCreateSuccessfully()
+                is ActionFormEvent.ConnectionError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.network_error_title)
                     dialogMessage = context.getString(R.string.network_error_message)
                 }
 
-                CreateGoalEvent.InvalidParams -> {
+                is ActionFormEvent.InvalidParams -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.form_dialog_title_generic_failure)
                     dialogMessage =
                         context.getString(R.string.form_dialog_message_missing_required_fields)
                 }
 
-                CreateGoalEvent.UnexpectedError -> {
+                is ActionFormEvent.UnexpectedError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.unexpected_error_title)
                     dialogMessage = context.getString(R.string.unexpected_error_message)
@@ -230,9 +219,9 @@ fun GoalFormEventHandler(
 
 @Preview(showBackground = true)
 @Composable
-fun GoalFormScreenPreview() {
-    GoalFormContent(
-        goalFormState = GoalFormState(),
+fun ActionFormScreenPreview() {
+    ActionFormContent(
+        actionState = ActionFormState(),
         onUIAction = { },
         onBackClicked = { }
     )

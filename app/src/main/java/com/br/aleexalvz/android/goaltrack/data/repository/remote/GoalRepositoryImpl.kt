@@ -37,15 +37,14 @@ class GoalRepositoryImpl @Inject constructor(
             networkRequest = NetworkRequest(
                 endpoint = GoalEndpoints.GOALS_ENDPOINT,
                 method = NetworkMethod.POST,
-                bodyJson = jsonBody
+                jsonBody = jsonBody
             ),
             responseSerializer = GoalResponse.serializer(),
         )
     }
 
     override suspend fun getGoalById(goalId: Long): NetworkResponse<GoalResponse> {
-        val getGoalByIdEndpoint =
-            GoalEndpoints.GET_GOAL_BY_ID.replace("{goalId}", goalId.toString())
+        val getGoalByIdEndpoint = GoalEndpoints.GOALS_ENDPOINT + "/" + goalId.toString()
 
         return networkProvider.request(
             networkRequest = NetworkRequest(
@@ -57,14 +56,34 @@ class GoalRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateGoal(goal: GoalModel): NetworkResponse<GoalResponse> {
-        TODO("Not yet implemented")
+        val updateGoalEndpoint = GoalEndpoints.GOALS_ENDPOINT + "/" + goal.id.toString()
+
+        val body = goal.toData()
+        val jsonBody = JsonHelper.toJson(body, GoalDTO.serializer())
+
+        return networkProvider.request(
+            networkRequest = NetworkRequest(
+                endpoint = updateGoalEndpoint,
+                method = NetworkMethod.PUT,
+                jsonBody = jsonBody
+            ),
+            responseSerializer = GoalResponse.serializer(),
+        )
     }
 
     override suspend fun getGoalByStatus(status: GoalStatusEnum): NetworkResponse<List<GoalResponse>> {
-        TODO("Not yet implemented")
+        // TODO Criar o serviço na api
+        return NetworkResponse.Success(emptyList())
     }
 
-    override suspend fun deleteGoalById(id: Long): NetworkResponse<Unit> {
-        TODO("Not yet implemented")
+    override suspend fun deleteGoalById(goalId: Long): NetworkResponse<Unit> {
+        val deleteGoalEndpoint = GoalEndpoints.GOALS_ENDPOINT + "/" + goalId.toString()
+
+        return networkProvider.request(
+            networkRequest = NetworkRequest(
+                endpoint = deleteGoalEndpoint,
+                method = NetworkMethod.DELETE
+            )
+        )
     }
 }

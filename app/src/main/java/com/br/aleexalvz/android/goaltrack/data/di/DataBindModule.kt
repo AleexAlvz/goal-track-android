@@ -1,12 +1,16 @@
 package com.br.aleexalvz.android.goaltrack.data.di
 
 import com.br.aleexalvz.android.goaltrack.data.repository.local.SessionRepositoryImpl
+import com.br.aleexalvz.android.goaltrack.data.repository.remote.ActionRepositoryImpl
 import com.br.aleexalvz.android.goaltrack.data.repository.remote.AuthRepositoryImpl
 import com.br.aleexalvz.android.goaltrack.data.repository.remote.GoalRepositoryImpl
 import com.br.aleexalvz.android.goaltrack.data.repository.remote.HomeRepositoryImpl
+import com.br.aleexalvz.android.goaltrack.data.repository.remote.NoteRepositoryImpl
+import com.br.aleexalvz.android.goaltrack.domain.repository.ActionRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.AuthRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.GoalRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.HomeRepository
+import com.br.aleexalvz.android.goaltrack.domain.repository.NoteRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.SessionRepository
 import dagger.Binds
 import dagger.Module
@@ -36,4 +40,14 @@ abstract class DataBindModule {
     abstract fun bindGoalRepository(
         impl: GoalRepositoryImpl
     ): GoalRepository
+
+    @Binds
+    abstract fun bindActionRepository(
+        impl: ActionRepositoryImpl
+    ): ActionRepository
+
+    @Binds
+    abstract fun bindNoteRepository(
+        impl: NoteRepositoryImpl
+    ): NoteRepository
 }

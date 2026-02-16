@@ -2,7 +2,7 @@ package com.br.aleexalvz.android.goaltrack.presenter.goal.data
 
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
 
-data class CreateGoalState(
+data class GoalFormState(
     val id: Long = -1L,
     val title: String = "",
     val description: String = "",

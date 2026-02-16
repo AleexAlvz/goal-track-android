@@ -17,15 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.br.aleexalvz.android.goaltrack.data.session.SessionManager
 
 @Composable
-fun HomeHeader(modifier: Modifier = Modifier) {
+fun HomeHeader(
+    modifier: Modifier = Modifier,
+    userName: String = getUserName()
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-
         IconButton(
             modifier = Modifier
                 .padding(end = 16.dp)
@@ -57,14 +60,17 @@ fun HomeHeader(modifier: Modifier = Modifier) {
             Text(
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
-                text = "Alex Alves"
+                text = userName
             )
         }
     }
 }
 
+private fun getUserName() = SessionManager.session?.fullName?.split(" ")?.take(2)?.joinToString(" ")
+    .orEmpty()
+
 @Preview(showBackground = true)
 @Composable
 fun HomeHeaderPreview() {
-    HomeHeader(Modifier)
+    HomeHeader(Modifier, userName = "Alex Alves")
 }

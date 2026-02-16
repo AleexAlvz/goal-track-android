@@ -13,15 +13,14 @@ object HomeEndpoints {
 
 object GoalEndpoints {
     const val GOALS_ENDPOINT = "goals"
-    const val GET_GOAL_BY_ID = "goals/{goalId}"
 }
 
-object GoalActionEndpoints {
-
+object ActionEndpoints {
+    const val ACTIONS_ENDPOINT = "actions"
 }
 
-object GoalActionExecutionEndpoints {
-
+object NoteEndpoints {
+    const val NOTES_ENDPOINT = "action-executions"
 }
 
 object UserEndpoints {

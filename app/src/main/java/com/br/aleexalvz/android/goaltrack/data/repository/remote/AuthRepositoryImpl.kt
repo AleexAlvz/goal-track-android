@@ -33,7 +33,7 @@ class AuthRepositoryImpl @Inject constructor(
                 networkRequest = NetworkRequest(
                     endpoint = LOGIN_ENDPOINT,
                     method = NetworkMethod.POST,
-                    bodyJson = jsonBody
+                    jsonBody = jsonBody
                 ),
                 responseSerializer = LoginResponse.serializer()
             )
@@ -52,7 +52,7 @@ class AuthRepositoryImpl @Inject constructor(
                 networkRequest = NetworkRequest(
                     endpoint = SIGNUP_ENDPOINT,
                     method = NetworkMethod.POST,
-                    bodyJson = jsonBody
+                    jsonBody = jsonBody
                 )
             )
             return response
@@ -69,7 +69,7 @@ class AuthRepositoryImpl @Inject constructor(
                 networkRequest = NetworkRequest(
                     endpoint = REFRESH_ENDPOINT,
                     method = NetworkMethod.POST,
-                    bodyJson = jsonBody
+                    jsonBody = jsonBody
                 ),
                 responseSerializer = LoginResponse.serializer()
             )
@@ -87,7 +87,7 @@ class AuthRepositoryImpl @Inject constructor(
                 networkRequest = NetworkRequest(
                     endpoint = RECOVERY_PASSWORD_ENDPOINT,
                     method = NetworkMethod.POST,
-                    bodyJson = jsonBody
+                    jsonBody = jsonBody
                 )
             )
             return response

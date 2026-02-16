@@ -117,7 +117,7 @@ class NetworkProviderImpl @Inject constructor(
     private fun NetworkRequest.getUrl(): String = BASE_URL_TEST + endpoint
 
     private fun NetworkRequest.getRequestBody(): RequestBody? =
-        bodyJson?.toRequestBody(JSON_MEDIA_TYPE.toMediaType())
+        jsonBody?.toRequestBody(JSON_MEDIA_TYPE.toMediaType())
 
     private fun Exception.toNetworkException(): NetworkException {
         val error: NetworkError = when (this) {

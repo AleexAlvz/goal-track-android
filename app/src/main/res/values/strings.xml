@@ -20,4 +20,11 @@
     <string name="goal_status_canceled">Cancelada</string>
     <string name="form_dialog_message_missing_required_fields">Revise todos os campos obrigatórios para poder salvar</string>
     <string name="form_dialog_title_generic_failure">Falha no formulário</string>
+    <string name="in_progress">Em andamento</string>
+    <string name="completed">Finalizado</string>
+    <string name="canceled">Cancelado</string>
+    <string name="once">Unica</string>
+    <string name="daily">Diária</string>
+    <string name="weekly">Semanal</string>
+    <string name="monthly">Mensal</string>
 </resources>
