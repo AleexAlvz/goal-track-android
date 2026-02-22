@@ -9,4 +9,5 @@ sealed interface GoalFormAction {
     data class UpdateSkills(val skills: List<String>) : GoalFormAction
 
     data object Submit : GoalFormAction
+    data object Delete : GoalFormAction
 }

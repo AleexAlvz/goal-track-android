@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,13 +40,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
+import com.br.aleexalvz.android.goaltrack.domain.model.goal.SkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.presenter.components.chip.InputChips
 import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.DefaultOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.TextFieldWithDropDown
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormEvent
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
 import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalFormViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
@@ -65,6 +67,9 @@ fun GoalFormScreen(
             navController.navigate(goalDetailWithId(goalId)) {
                 popUpTo(HomeRoutes.GOALS)
             }
+        },
+        onDeleted = {
+            navController.navigate(HomeRoutes.GOALS)
         }
     )
 
@@ -84,20 +89,51 @@ fun GoalFormContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Button(
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(12.dp),
-            onClick = { onUIAction(GoalFormAction.Submit) }
+                .padding(16.dp)
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Salvar meta",
-                fontSize = 16.sp
-            )
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                onClick = { onUIAction(GoalFormAction.Submit) }
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = if (goalFormState.isEditMode) {
+                        "Editar meta"
+                    } else {
+                        "Salvar meta"
+                    },
+                    fontSize = 16.sp
+                )
+            }
+
+            if (goalFormState.isEditMode) {
+                Spacer(Modifier.padding(8.dp))
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    onClick = { onUIAction(GoalFormAction.Delete) }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = "Excluir meta",
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
+
     }
     Column(
         modifier = Modifier.fillMaxSize()
@@ -128,7 +164,11 @@ fun GoalFormContent(
             Text(
                 modifier = Modifier
                     .padding(top = 16.dp),
-                text = "Criar nova meta",
+                text = if (goalFormState.isEditMode) {
+                    "Editar meta"
+                } else {
+                    "Criar nova meta"
+                },
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
@@ -198,7 +238,8 @@ fun GoalFormContent(
 @Composable
 fun GoalFormEventHandler(
     goalFormViewModel: GoalFormViewModel,
-    onSubmittedWithSuccess: (goalId: Long) -> Unit
+    onSubmittedWithSuccess: (goalId: Long) -> Unit,
+    onDeleted: () -> Unit,
 ) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -208,22 +249,24 @@ fun GoalFormEventHandler(
     LaunchedEffect(goalFormViewModel) {
         goalFormViewModel.event.collect { event ->
             when (event) {
-                is CreateGoalEvent.SubmittedWithSuccess -> onSubmittedWithSuccess(event.goalId)
+                is GoalFormEvent.SubmittedWithSuccess -> onSubmittedWithSuccess(event.goalId)
 
-                is CreateGoalEvent.ConnectionError -> {
+                is GoalFormEvent.Deleted -> onDeleted()
+
+                is GoalFormEvent.ConnectionError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.network_error_title)
                     dialogMessage = context.getString(R.string.network_error_message)
                 }
 
-                is CreateGoalEvent.InvalidParams -> {
+                is GoalFormEvent.InvalidParams -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.form_dialog_title_generic_failure)
                     dialogMessage =
                         context.getString(R.string.form_dialog_message_missing_required_fields)
                 }
 
-                is CreateGoalEvent.UnexpectedError -> {
+                is GoalFormEvent.UnexpectedError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.unexpected_error_title)
                     dialogMessage = context.getString(R.string.unexpected_error_message)
@@ -243,9 +286,9 @@ fun GoalFormEventHandler(
     }
 }
 
-@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Create Mode - Light", showBackground = true)
 @Composable
-fun GoalFormScreenPreview() {
+fun GoalFormScreenCreateLightPreview() {
     GoalTrackTheme {
         GoalFormContent(
             goalFormState = GoalFormState(),
@@ -255,12 +298,50 @@ fun GoalFormScreenPreview() {
     }
 }
 
-@Preview(name = "Dark Mode", showBackground = true)
+@Preview(name = "Create Mode - Dark", showBackground = true)
 @Composable
-fun GoalFormScreenPreviewDark() {
+fun GoalFormScreenCreateDarkPreview() {
     GoalTrackTheme(darkTheme = true) {
         GoalFormContent(
             goalFormState = GoalFormState(),
+            onUIAction = { },
+            onBackClicked = { }
+        )
+    }
+}
+
+@Preview(name = "Edit Mode - Light", showBackground = true)
+@Composable
+fun GoalFormScreenEditLightPreview() {
+    GoalTrackTheme {
+        GoalFormContent(
+            goalFormState = GoalFormState(
+                id = 1,
+                title = "Edit mode title",
+                description = "Edit mode description",
+                category = GoalCategoryEnum.CAREER,
+                skills = listOf(SkillModel("Compose"), SkillModel("Kotlin")),
+                isEditMode = true
+            ),
+            onUIAction = { },
+            onBackClicked = { }
+        )
+    }
+}
+
+@Preview(name = "Edit Mode - Dark", showBackground = true)
+@Composable
+fun GoalFormScreenEditDarkPreview() {
+    GoalTrackTheme(darkTheme = true) {
+        GoalFormContent(
+            goalFormState = GoalFormState(
+                id = 1,
+                title = "Edit mode title",
+                description = "Edit mode description",
+                category = GoalCategoryEnum.CAREER,
+                skills = listOf(SkillModel("Compose"), SkillModel("Kotlin")),
+                isEditMode = true
+            ),
             onUIAction = { },
             onBackClicked = { }
         )

@@ -12,5 +12,6 @@ data class GoalFormState(
     val titleError: String? = null,
     val descriptionError: String? = null,
     val categoryError: String? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isEditMode: Boolean = false
 )

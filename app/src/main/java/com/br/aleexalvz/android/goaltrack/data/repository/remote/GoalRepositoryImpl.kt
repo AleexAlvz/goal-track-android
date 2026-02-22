@@ -76,8 +76,8 @@ class GoalRepositoryImpl @Inject constructor(
         return NetworkResponse.Success(emptyList())
     }
 
-    override suspend fun deleteGoalById(goalId: Long): NetworkResponse<Unit> {
-        val deleteGoalEndpoint = GoalEndpoints.GOALS_ENDPOINT + "/" + goalId.toString()
+    override suspend fun deleteGoalById(id: Long): NetworkResponse<Unit> {
+        val deleteGoalEndpoint = GoalEndpoints.GOALS_ENDPOINT + "/" + id.toString()
 
         return networkProvider.request(
             networkRequest = NetworkRequest(

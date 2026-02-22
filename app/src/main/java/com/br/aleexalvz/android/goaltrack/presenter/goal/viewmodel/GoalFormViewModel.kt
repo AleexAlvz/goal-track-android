@@ -11,8 +11,8 @@ import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.SkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.repository.GoalRepository
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormEvent
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
 import com.br.aleexalvz.android.goaltrack.presenter.helper.validateIsNotBlank
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.GOAL_ID_ARG
@@ -34,16 +34,15 @@ class GoalFormViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val goalId: Long by lazy { savedStateHandle.get<Long>(GOAL_ID_ARG) ?: -1L }
-    private val isEditMode = goalId != -1L
 
     private val _state = MutableStateFlow(GoalFormState())
     val state = _state.asStateFlow()
 
-    private val _event = MutableSharedFlow<CreateGoalEvent>()
+    private val _event = MutableSharedFlow<GoalFormEvent>()
     val event = _event.asSharedFlow()
 
     init {
-        if (isEditMode) {
+        if (goalId != -1L) {
             viewModelScope.launch(IO) {
                 goalRepository.getGoalById(goalId).onSuccess { goal ->
                     _state.update {
@@ -52,11 +51,12 @@ class GoalFormViewModel @Inject constructor(
                             title = goal.title,
                             description = goal.description.orEmpty(),
                             category = goal.category.toGoalCategoryEnum(),
-                            skills = goal.skills.map { skill -> skill.toSkillModel() }
+                            skills = goal.skills.map { skill -> skill.toSkillModel() },
+                            isEditMode = true
                         )
                     }
                 }.onFailure {
-                    _event.emit(CreateGoalEvent.UnexpectedError)
+                    _event.emit(GoalFormEvent.UnexpectedError)
                 }
             }
         }
@@ -83,6 +83,10 @@ class GoalFormViewModel @Inject constructor(
             is GoalFormAction.Submit -> {
                 submitGoal()
             }
+
+            is GoalFormAction.Delete -> {
+                deleteGoal()
+            }
         }
     }
 
@@ -108,21 +112,29 @@ class GoalFormViewModel @Inject constructor(
         validateFields()
 
         if (hasValidFields()) {
-            withContext(IO) {
-                val response = if (isEditMode) {
+            val response = withContext(IO) {
+                if (state.value.isEditMode) {
                     goalRepository.updateGoal(goal = state.value.toGoalModel())
                 } else {
                     goalRepository.createGoal(goal = state.value.toGoalModel())
                 }
-
-                response.onSuccess { goal ->
-                    _state.update { it.copy(isLoading = false) }
-                    _event.emit(CreateGoalEvent.SubmittedWithSuccess(goal.id))
-                }.onFailure {
-                    _state.update { it.copy(isLoading = false) }
-                    _event.emit(CreateGoalEvent.UnexpectedError) //TODO validar erro do repository
-                }
             }
+
+            response.onSuccess { goal ->
+                _state.update { it.copy(isLoading = false) }
+                _event.emit(GoalFormEvent.SubmittedWithSuccess(goal.id))
+            }.onFailure {
+                _state.update { it.copy(isLoading = false) }
+                _event.emit(GoalFormEvent.UnexpectedError) //TODO validar erro do repository
+            }
+        }
+    }
+
+    private fun deleteGoal() = viewModelScope.launch {
+        withContext(IO) { goalRepository.deleteGoalById(goalId) }.onSuccess {
+            _event.emit(GoalFormEvent.Deleted)
+        }.onFailure {
+            _event.emit(GoalFormEvent.UnexpectedError)
         }
     }
 
