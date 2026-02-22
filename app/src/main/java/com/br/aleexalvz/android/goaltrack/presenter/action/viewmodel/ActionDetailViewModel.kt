@@ -8,8 +8,10 @@ import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
 import com.br.aleexalvz.android.goaltrack.core.network.model.getOrNull
 import com.br.aleexalvz.android.goaltrack.data.model.response.toActionModel
 import com.br.aleexalvz.android.goaltrack.data.model.response.toNoteModel
+import com.br.aleexalvz.android.goaltrack.domain.model.note.NoteModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.ActionRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.NoteRepository
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailAction
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,9 +31,9 @@ class ActionDetailViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ActionDetailState())
     val state = _state.asStateFlow()
+    val actionId: Long? = savedStateHandle[HomeRoutes.ACTION_ID_ARG]
 
     init {
-        val actionId: Long? = savedStateHandle[HomeRoutes.ACTION_ID_ARG]
         if (actionId != null && actionId != -1L) {
             fetchActionDetail(actionId)
             fetchNotes(actionId)
@@ -69,6 +71,27 @@ class ActionDetailViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _state.update { it.copy(isLoading = false, errorToFetch = true) }
+            }
+        }
+    }
+
+    fun onUIAction(uiAction: ActionDetailAction) {
+        when (uiAction) {
+            is ActionDetailAction.addNote -> addNote(uiAction.note)
+        }
+    }
+
+    private fun addNote(note: String) = viewModelScope.launch(IO) {
+        noteRepository.createNote(
+            NoteModel(
+                actionId = actionId!!,
+                notes = note
+            )
+        ).onSuccess { newNote ->
+            _state.update {
+                it.copy(
+                    notes = it.notes.toMutableList().apply { add(newNote.toNoteModel()) }
+                )
             }
         }
     }

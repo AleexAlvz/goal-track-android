@@ -1,5 +1,6 @@
 package com.br.aleexalvz.android.goaltrack.presenter.action.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,9 +45,11 @@ import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionFrequencyEnu
 import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionModel
 import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
 import com.br.aleexalvz.android.goaltrack.domain.model.note.NoteModel
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailAction
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.action.viewmodel.ActionDetailViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.components.header.SectionHeader
+import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
 import java.time.LocalDate
 
@@ -57,17 +63,29 @@ fun ActionDetailScreen(
     ActionDetailContent(
         actionDetailState = actionDetailState,
         onBackClicked = { navController.popBackStack() },
-        onNavigateToCreateNote = { /* TODO: Navegar para tela de criar nota */ }
+        onNavigateToEditAction = { actionId ->
+            navController.navigate(
+                HomeRoutes.actionFormEditMode(
+                    actionId
+                )
+            )
+        },
+        onUIAction = {
+            viewModel.onUIAction(it)
+        }
     )
 }
 
 @Composable
 fun ActionDetailContent(
     actionDetailState: ActionDetailState,
-    onBackClicked: () -> Unit,
-    onNavigateToCreateNote: () -> Unit,
+    onBackClicked: () -> Unit = {},
+    onNavigateToEditAction: (actionId: Long) -> Unit = {},
+    onUIAction: (uiAction: ActionDetailAction) -> Unit = {}
 ) {
+
     val context = LocalContext.current
+    var showNoteForm by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -141,8 +159,23 @@ fun ActionDetailContent(
                     sectionIcon = Icons.AutoMirrored.Filled.Notes,
                     sectionTitle = "Notas de Progresso",
                     sectionAction = "+ Nova nota",
-                    onSectionActionClicked = onNavigateToCreateNote
+                    onSectionActionClicked = { showNoteForm = true }
                 )
+            }
+
+            item {
+                AnimatedVisibility(visible = showNoteForm) {
+                    NoteForm(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        onNoteSaved = { note ->
+                            onUIAction(ActionDetailAction.addNote(note))
+                            showNoteForm = false
+                        },
+                        onCanceled = { showNoteForm = false }
+                    )
+                }
             }
 
             items(actionDetailState.notes.size) { index ->
@@ -223,9 +256,7 @@ fun ActionDetailScreenPreview() {
                 notes = listOf(
                     NoteModel(0L, 0L, LocalDate.now(), "Nota de progresso: Hoje eu fiz algo")
                 )
-            ),
-            onBackClicked = {},
-            onNavigateToCreateNote = {}
+            )
         )
     }
 }
@@ -249,9 +280,7 @@ fun ActionDetailScreenPreviewDark() {
                 notes = listOf(
                     NoteModel(0L, 0L, LocalDate.now(), "Nota de progresso: Hoje eu fiz algo")
                 )
-            ),
-            onBackClicked = {},
-            onNavigateToCreateNote = {}
+            )
         )
     }
 }

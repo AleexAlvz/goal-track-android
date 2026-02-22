@@ -8,13 +8,13 @@ import java.time.LocalDate
 data class NoteResponse(
     val id: Long,
     val actionId: Long,
-    val date: String,
+    val executionDate: String,
     val notes: String
 )
 
 fun NoteResponse.toNoteModel() = NoteModel(
     id = id,
     actionId = actionId,
-    executionDate = LocalDate.parse(date),
+    executionDate = LocalDate.parse(executionDate),
     notes = notes
 )
