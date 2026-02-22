@@ -49,6 +49,7 @@ import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
 import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalFormViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
+import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes.goalDetailWithId
 import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
 
 @Composable
@@ -56,16 +57,13 @@ fun GoalFormScreen(
     navController: NavController,
     goalFormViewModel: GoalFormViewModel = hiltViewModel()
 ) {
-
     val goalState by goalFormViewModel.state.collectAsState()
 
     GoalFormEventHandler(
         goalFormViewModel = goalFormViewModel,
-        onCreateSuccessfully = {
-            navController.navigate(HomeRoutes.GOALS) {
-                popUpTo(HomeRoutes.GOAL_FORM) {
-                    inclusive = true
-                }
+        onSubmittedWithSuccess = { goalId ->
+            navController.navigate(goalDetailWithId(goalId)) {
+                popUpTo(HomeRoutes.GOALS)
             }
         }
     )
@@ -200,7 +198,7 @@ fun GoalFormContent(
 @Composable
 fun GoalFormEventHandler(
     goalFormViewModel: GoalFormViewModel,
-    onCreateSuccessfully: () -> Unit
+    onSubmittedWithSuccess: (goalId: Long) -> Unit
 ) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -210,22 +208,22 @@ fun GoalFormEventHandler(
     LaunchedEffect(goalFormViewModel) {
         goalFormViewModel.event.collect { event ->
             when (event) {
-                CreateGoalEvent.Created -> onCreateSuccessfully()
+                is CreateGoalEvent.SubmittedWithSuccess -> onSubmittedWithSuccess(event.goalId)
 
-                CreateGoalEvent.ConnectionError -> {
+                is CreateGoalEvent.ConnectionError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.network_error_title)
                     dialogMessage = context.getString(R.string.network_error_message)
                 }
 
-                CreateGoalEvent.InvalidParams -> {
+                is CreateGoalEvent.InvalidParams -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.form_dialog_title_generic_failure)
                     dialogMessage =
                         context.getString(R.string.form_dialog_message_missing_required_fields)
                 }
 
-                CreateGoalEvent.UnexpectedError -> {
+                is CreateGoalEvent.UnexpectedError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.unexpected_error_title)
                     dialogMessage = context.getString(R.string.unexpected_error_message)

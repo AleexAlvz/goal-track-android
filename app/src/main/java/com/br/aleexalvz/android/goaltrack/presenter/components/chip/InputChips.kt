@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -101,9 +100,7 @@ fun InputChips(
             contentColor = MaterialTheme.colorScheme.onSurface
         ) {
             BasicTextField(
-                modifier = Modifier
-                    .widthIn(min = 80.dp)
-                    .padding(horizontal = 12.dp),
+                modifier = Modifier.padding(horizontal = 12.dp),
                 value = text,
                 textStyle = TextStyle(
                     fontSize = 14.sp,
@@ -127,11 +124,10 @@ fun InputChips(
             ) { innerTextField ->
                 Row(
                     modifier = Modifier
-                        .padding(vertical = 6.dp)
-                        .fillMaxWidth(),
+                        .padding(6.dp)
+                        .wrapContentWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Box(Modifier.weight(1f)) {
                         if (text.isEmpty()) {
                             Text(

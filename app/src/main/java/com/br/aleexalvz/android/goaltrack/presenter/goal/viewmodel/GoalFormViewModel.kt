@@ -115,9 +115,9 @@ class GoalFormViewModel @Inject constructor(
                     goalRepository.createGoal(goal = state.value.toGoalModel())
                 }
 
-                response.onSuccess {
+                response.onSuccess { goal ->
                     _state.update { it.copy(isLoading = false) }
-                    _event.emit(CreateGoalEvent.Created)
+                    _event.emit(CreateGoalEvent.SubmittedWithSuccess(goal.id))
                 }.onFailure {
                     _state.update { it.copy(isLoading = false) }
                     _event.emit(CreateGoalEvent.UnexpectedError) //TODO validar erro do repository
