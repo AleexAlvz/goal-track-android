@@ -1,7 +1,6 @@
 package com.br.aleexalvz.android.goaltrack.presenter.components.textfield
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -22,8 +21,8 @@ fun DefaultOutlinedTextField(
     text: String,
     onValueChange: (String) -> Unit,
     labelText: String? = null,
-    leadingIcon: @Composable() (() -> Unit)? = null,
-    trailingIcon: @Composable() (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     errorMessage: String? = null,
     prefix: String? = null,
     readOnly: Boolean? = false,
@@ -31,7 +30,7 @@ fun DefaultOutlinedTextField(
 ) {
 
     OutlinedTextField(
-        modifier = modifier.wrapContentHeight(),
+        modifier = modifier,
         value = text,
         textStyle = TextStyle(fontSize = 14.sp),
         trailingIcon = {

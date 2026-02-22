@@ -1,10 +1,13 @@
 package com.br.aleexalvz.android.goaltrack.presenter.goal.ui
 
+import android.content.Context
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,11 +16,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,7 +32,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,7 +52,10 @@ import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalStatusEnum
+import com.br.aleexalvz.android.goaltrack.domain.model.goal.SkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.getMessage
+import com.br.aleexalvz.android.goaltrack.presenter.components.chip.InformativeChip
+import com.br.aleexalvz.android.goaltrack.presenter.components.header.SectionHeader
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalDetailViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
@@ -65,6 +73,11 @@ fun GoalDetailScreen(
     GoalDetailContent(
         goalDetailState = goalDetailState,
         onBackClicked = { navController.popBackStack() },
+        onEditClicked = {
+            goalDetailState.goal?.id?.let { id ->
+                navController.navigate(HomeRoutes.goalFormEditMode(id))
+            }
+        },
         onNavigateToCreateAction = {
             navController.navigate(
                 HomeRoutes.actionFormCreateMode(
@@ -82,6 +95,7 @@ fun GoalDetailScreen(
 fun GoalDetailContent(
     goalDetailState: GoalDetailState,
     onBackClicked: () -> Unit,
+    onEditClicked: () -> Unit,
     onNavigateToCreateAction: () -> Unit,
     onNavigateToActionDetail: (actionId: Long) -> Unit,
 ) {
@@ -94,112 +108,161 @@ fun GoalDetailContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(
-                        modifier = Modifier.padding(start = 8.dp),
-                        onClick = onBackClicked
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
-                    }
-                    Text(
-                        text = "Detalhes da Meta",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f)
+            item { GoalDetailHeader(onBackClicked, onEditClicked) }
+            item { GoalDetailSection(goalDetailState, context) }
+            skillListSection(goalDetailState.goal?.skills ?: emptyList())
+            actionListSection(
+                actions = goalDetailState.actions,
+                onNavigateToCreateAction = onNavigateToCreateAction,
+                onNavigateToActionDetail = onNavigateToActionDetail
+            )
+            item { Spacer(modifier = Modifier.height(100.dp)) }
+        }
+    }
+}
+
+@Composable
+private fun GoalDetailHeader(onBackClicked: () -> Unit, onEditClicked: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(
+            modifier = Modifier.padding(start = 8.dp),
+            onClick = onBackClicked
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Voltar"
+            )
+        }
+
+        Text(
+            text = "Detalhes da Meta",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+        )
+
+
+        Row(
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .clickable { onEditClicked() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Voltar",
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.padding(horizontal = 2.dp))
+            Text(
+                text = "Editar",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+    HorizontalDivider()
+}
+
+@Composable
+private fun GoalDetailSection(
+    goalDetailState: GoalDetailState,
+    context: Context
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        InformativeChip(
+            text = goalDetailState.goal?.status?.getMessage(context).orEmpty(),
+            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+        Spacer(Modifier.padding(4.dp))
+        Text(
+            text = goalDetailState.goal?.title.orEmpty(),
+            fontWeight = FontWeight.Bold,
+            fontSize = 36.sp
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = goalDetailState.goal?.description.orEmpty(),
+            fontSize = 16.sp
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+private fun LazyListScope.skillListSection(skills: List<SkillModel>) {
+    item {
+        SectionHeader(
+            sectionIcon = Icons.AutoMirrored.Filled.MenuBook,
+            sectionTitle = "Competências relacionadas"
+        )
+    }
+    if (skills.isEmpty()) {
+        item {
+            Text(
+                text = "Nenhuma competência foi adicionada a esta meta.",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+        }
+    } else {
+        item {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                skills.forEach { skill ->
+                    InformativeChip(
+                        modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
+                        text = skill.name
                     )
-                    Spacer(modifier = Modifier.padding(end = 56.dp))
                 }
-                HorizontalDivider()
-            }
-
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ) {
-                        Text(
-                            text = goalDetailState.goal?.status?.getMessage(context).orEmpty(),
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
-                    }
-                    Spacer(Modifier.padding(4.dp))
-                    Text(
-                        text = goalDetailState.goal?.title.orEmpty(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = goalDetailState.goal?.description.orEmpty(),
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(start = 16.dp),
-                        imageVector = Icons.AutoMirrored.Filled.ListAlt,
-                        contentDescription = ""
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 8.dp),
-                        text = "Plano de ação",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "+ Nova ação",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.End,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .clickable { onNavigateToCreateAction() }
-                    )
-                }
-            }
-
-            items(goalDetailState.actions.size) { index ->
-                val action = goalDetailState.actions[index]
-                ActionListItem(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    action = action,
-                    onClick = { onNavigateToActionDetail(action.id) }
-                )
-
-                Spacer(Modifier.padding(8.dp))
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(100.dp))
             }
         }
+    }
+}
+
+private fun LazyListScope.actionListSection(
+    actions: List<ActionModel>,
+    onNavigateToCreateAction: () -> Unit,
+    onNavigateToActionDetail: (actionId: Long) -> Unit
+) {
+
+    item {
+        SectionHeader(
+            sectionIcon = Icons.AutoMirrored.Filled.ListAlt,
+            sectionTitle = "Plano de ação",
+            sectionAction = "+ Nova ação",
+            onSectionActionClicked = onNavigateToCreateAction
+        )
+    }
+
+    items(
+        items = actions,
+        key = { action -> action.id }
+    ) { action ->
+        ActionListItem(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            action = action,
+            onClick = { onNavigateToActionDetail(action.id) }
+        )
+
+        Spacer(Modifier.padding(8.dp))
     }
 }
 
@@ -336,6 +399,7 @@ fun GoalDetailScreenPreview() {
                 actions = actions
             ),
             onBackClicked = {},
+            onEditClicked = {},
             onNavigateToCreateAction = {},
             onNavigateToActionDetail = {}
         )

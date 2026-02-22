@@ -8,6 +8,7 @@ data class GoalDTO(
     val title: String,
     val description: String? = "",
     val category: String,
+    val skills: List<String>,
     val creationDate: String,
     val endDate: String? = null,
     val status: String

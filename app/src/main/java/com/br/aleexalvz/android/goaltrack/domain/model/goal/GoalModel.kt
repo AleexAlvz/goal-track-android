@@ -7,6 +7,7 @@ data class GoalModel(
     val title: String,
     val description: String? = "",
     val category: GoalCategoryEnum,
+    val skills: List<SkillModel> = emptyList(),
     val creationDate: LocalDate = LocalDate.now(),
     val endDate: LocalDate? = null,
     val status: GoalStatusEnum = GoalStatusEnum.IN_PROGRESS

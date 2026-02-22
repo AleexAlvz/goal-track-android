@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -39,14 +40,16 @@ import androidx.navigation.NavController
 import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
+import com.br.aleexalvz.android.goaltrack.presenter.components.chip.InputChips
 import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.DefaultOutlinedTextField
 import com.br.aleexalvz.android.goaltrack.presenter.components.textfield.TextFieldWithDropDown
-import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormAction
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalFormState
 import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalFormViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
+import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
 
 @Composable
 fun GoalFormScreen(
@@ -158,7 +161,8 @@ fun GoalFormContent(
         DefaultOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                .heightIn(min = 120.dp)
+                .padding(start = 16.dp, end = 16.dp),
             text = goalFormState.description,
             labelText = "Descrição",
             onValueChange = { onUIAction(GoalFormAction.UpdateDescription(it)) },
@@ -168,16 +172,29 @@ fun GoalFormContent(
         TextFieldWithDropDown(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 120.dp)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                .padding(start = 16.dp, end = 16.dp),
             dropDownValues = GoalCategoryEnum.entries.map { it.name },
             text = goalFormState.category?.name.orEmpty(),
             errorMessage = goalFormState.categoryError,
             labelText = "Categoria",
             onSelectedItem = { onUIAction(GoalFormAction.UpdateCategory(it.toGoalCategoryEnum())) }
         )
-    }
 
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            text = "Habilidades a serem desenvolvidas",
+            style = MaterialTheme.typography.titleMedium,
+        )
+
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        InputChips(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            values = goalFormState.skills.map { it.name },
+            onValuesChange = { onUIAction(GoalFormAction.UpdateSkills(it)) },
+            label = "Adicionar habilidade"
+        )
+    }
 }
 
 @Composable
@@ -228,12 +245,26 @@ fun GoalFormEventHandler(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Light Mode", showBackground = true)
 @Composable
 fun GoalFormScreenPreview() {
-    GoalFormContent(
-        goalFormState = GoalFormState(),
-        onUIAction = { },
-        onBackClicked = { }
-    )
+    GoalTrackTheme {
+        GoalFormContent(
+            goalFormState = GoalFormState(),
+            onUIAction = { },
+            onBackClicked = { }
+        )
+    }
+}
+
+@Preview(name = "Dark Mode", showBackground = true)
+@Composable
+fun GoalFormScreenPreviewDark() {
+    GoalTrackTheme(darkTheme = true) {
+        GoalFormContent(
+            goalFormState = GoalFormState(),
+            onUIAction = { },
+            onBackClicked = { }
+        )
+    }
 }

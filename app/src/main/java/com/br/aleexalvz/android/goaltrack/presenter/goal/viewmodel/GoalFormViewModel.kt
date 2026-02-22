@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.br.aleexalvz.android.goaltrack.core.network.extension.onFailure
 import com.br.aleexalvz.android.goaltrack.core.network.extension.onSuccess
+import com.br.aleexalvz.android.goaltrack.data.model.response.toSkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalModel
+import com.br.aleexalvz.android.goaltrack.domain.model.goal.SkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.toGoalCategoryEnum
 import com.br.aleexalvz.android.goaltrack.domain.repository.GoalRepository
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.CreateGoalEvent
@@ -49,7 +51,8 @@ class GoalFormViewModel @Inject constructor(
                             id = goal.id,
                             title = goal.title,
                             description = goal.description.orEmpty(),
-                            category = goal.category.toGoalCategoryEnum()
+                            category = goal.category.toGoalCategoryEnum(),
+                            skills = goal.skills.map { skill -> skill.toSkillModel() }
                         )
                     }
                 }.onFailure {
@@ -73,6 +76,10 @@ class GoalFormViewModel @Inject constructor(
                 updateCategory(uiAction.category)
             }
 
+            is GoalFormAction.UpdateSkills -> {
+                updateSkills(uiAction.skills)
+            }
+
             is GoalFormAction.Submit -> {
                 submitGoal()
             }
@@ -89,6 +96,10 @@ class GoalFormViewModel @Inject constructor(
 
     private fun updateCategory(category: GoalCategoryEnum) {
         _state.update { it.copy(category = category) }
+    }
+
+    private fun updateSkills(skills: List<String>) {
+        _state.update { it.copy(skills = skills.map { name -> SkillModel(name = name) }) }
     }
 
     private fun submitGoal() = viewModelScope.launch {
@@ -130,8 +141,10 @@ class GoalFormViewModel @Inject constructor(
     }
 
     private fun GoalFormState.toGoalModel() = GoalModel(
+        id = id,
         title = title,
         description = description,
-        category = category!!
+        category = category!!,
+        skills = skills
     )
 }

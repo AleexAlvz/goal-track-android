@@ -14,7 +14,8 @@ data class GoalResponse(
     val category: String,
     val creationDate: String,
     val endDate: String?,
-    val status: String
+    val status: String,
+    val skills: List<SkillResponse>
 )
 
 fun GoalResponse.toGoalModel() = GoalModel(
@@ -24,7 +25,8 @@ fun GoalResponse.toGoalModel() = GoalModel(
     category = category.toGoalCategoryEnum(),
     creationDate = LocalDate.parse(creationDate),
     endDate = endDate?.let { LocalDate.parse(endDate) },
-    status = GoalStatusEnum.entries.first { it.name == status }
+    status = GoalStatusEnum.entries.first { it.name == status },
+    skills = skills.map { it.toSkillModel() }
 )
 
 

@@ -17,12 +17,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.StartDestination
 import com.br.aleexalvz.android.goaltrack.presenter.action.ui.ActionDetailScreen
 import com.br.aleexalvz.android.goaltrack.presenter.action.ui.ActionFormScreen
@@ -51,10 +53,26 @@ fun AppNavGraph(
     }
 
     val bottomNavigationItems = listOf(
-        BottomNavItem("Home", HomeRoutes.HOME_SCREEN, Icons.Filled.Home),
-        BottomNavItem("Goals", HomeRoutes.GOALS, Icons.Filled.TaskAlt),
-        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Filled.Flag),
-        BottomNavItem("Settings", HomeRoutes.SETTINGS, Icons.Filled.Settings),
+        BottomNavItem(
+            stringResource(R.string.tabbar_home),
+            HomeRoutes.HOME_SCREEN,
+            Icons.Filled.Home
+        ),
+        BottomNavItem(
+            stringResource(R.string.tabbar_goals),
+            HomeRoutes.GOALS,
+            Icons.Filled.TaskAlt
+        ),
+        BottomNavItem(
+            stringResource(R.string.tabbar_calendar),
+            HomeRoutes.CALENDAR,
+            Icons.Filled.Flag
+        ),
+        BottomNavItem(
+            stringResource(R.string.tabbar_settings),
+            HomeRoutes.SETTINGS,
+            Icons.Filled.Settings
+        ),
     )
 
     Scaffold(

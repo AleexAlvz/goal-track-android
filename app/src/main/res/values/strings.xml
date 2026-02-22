@@ -27,4 +27,8 @@
     <string name="daily">Diária</string>
     <string name="weekly">Semanal</string>
     <string name="monthly">Mensal</string>
+    <string name="tabbar_home">Home</string>
+    <string name="tabbar_goals">Metas</string>
+    <string name="tabbar_calendar">Calendário</string>
+    <string name="tabbar_settings">Configurações</string>
 </resources>

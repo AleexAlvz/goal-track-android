@@ -17,9 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 
 data class BottomNavItem(
@@ -76,11 +78,12 @@ fun AppNavigationBar(
 )
 @Composable
 fun NavigationBarPreview() {
+    val context = LocalContext.current
     val bottomNavigationItems = listOf(
-        BottomNavItem("Home", HomeRoutes.HOME_SCREEN, Icons.Filled.Home),
-        BottomNavItem("Goals", HomeRoutes.GOALS, Icons.Filled.Flag),
-        BottomNavItem("Calendar", HomeRoutes.CALENDAR, Icons.Filled.CalendarMonth),
-        BottomNavItem("Settings", HomeRoutes.SETTINGS, Icons.Filled.Settings)
+        BottomNavItem(stringResource(R.string.tabbar_home), HomeRoutes.HOME_SCREEN, Icons.Filled.Home),
+        BottomNavItem(stringResource(R.string.tabbar_goals), HomeRoutes.GOALS, Icons.Filled.Flag),
+        BottomNavItem(stringResource(R.string.tabbar_calendar), HomeRoutes.CALENDAR, Icons.Filled.CalendarMonth),
+        BottomNavItem(stringResource(R.string.tabbar_settings), HomeRoutes.SETTINGS, Icons.Filled.Settings)
     )
     Scaffold(bottomBar = {
         AppNavigationBar(

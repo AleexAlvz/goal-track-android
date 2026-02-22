@@ -8,6 +8,7 @@ fun GoalModel.toData() = GoalDTO(
     title = title,
     description = description,
     category = category.name,
+    skills = skills.map { it.name },
     creationDate = creationDate.toString(),
     endDate = endDate?.toString(),
     status = status.name

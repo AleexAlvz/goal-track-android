@@ -43,6 +43,7 @@ import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
 import com.br.aleexalvz.android.goaltrack.domain.model.note.NoteModel
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.action.viewmodel.ActionDetailViewModel
+import com.br.aleexalvz.android.goaltrack.presenter.components.header.SectionHeader
 import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
 import java.time.LocalDate
 
@@ -136,34 +137,12 @@ fun ActionDetailContent(
             }
 
             item {
-                Row(
-                    modifier = Modifier.padding(vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        modifier = Modifier.padding(start = 16.dp),
-                        imageVector = Icons.AutoMirrored.Filled.Notes,
-                        contentDescription = ""
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(start = 8.dp),
-                        text = "Notas de Progresso",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Start
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = "+ Nova nota",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.End,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .clickable { onNavigateToCreateNote() }
-                    )
-                }
+                SectionHeader(
+                    sectionIcon = Icons.AutoMirrored.Filled.Notes,
+                    sectionTitle = "Notas de Progresso",
+                    sectionAction = "+ Nova nota",
+                    onSectionActionClicked = onNavigateToCreateNote
+                )
             }
 
             items(actionDetailState.notes.size) { index ->
