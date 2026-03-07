@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -63,12 +65,14 @@ fun ActionDetailScreen(
     ActionDetailContent(
         actionDetailState = actionDetailState,
         onBackClicked = { navController.popBackStack() },
-        onNavigateToEditAction = { actionId ->
-            navController.navigate(
-                HomeRoutes.actionFormEditMode(
-                    actionId
+        onEditClicked = {
+            actionDetailState.action?.let { action ->
+                navController.navigate(
+                    HomeRoutes.actionFormEditMode(
+                        actionId = action.id
+                    )
                 )
-            )
+            }
         },
         onUIAction = {
             viewModel.onUIAction(it)
@@ -80,7 +84,7 @@ fun ActionDetailScreen(
 fun ActionDetailContent(
     actionDetailState: ActionDetailState,
     onBackClicked: () -> Unit = {},
-    onNavigateToEditAction: (actionId: Long) -> Unit = {},
+    onEditClicked: () -> Unit = {},
     onUIAction: (uiAction: ActionDetailAction) -> Unit = {}
 ) {
 
@@ -94,32 +98,10 @@ fun ActionDetailContent(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(
-                        modifier = Modifier.padding(start = 8.dp),
-                        onClick = onBackClicked
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
-                        )
-                    }
-                    Text(
-                        text = "Detalhes da Ação",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Spacer(modifier = Modifier.padding(end = 56.dp))
-                }
-                HorizontalDivider()
+                ActionDetailHeader(
+                    onBackClicked = onBackClicked,
+                    onEditClicked = onEditClicked
+                )
             }
 
             item {
@@ -194,6 +176,58 @@ fun ActionDetailContent(
             }
         }
     }
+}
+
+@Composable
+private fun ActionDetailHeader(
+    onBackClicked: () -> Unit,
+    onEditClicked: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconButton(
+            modifier = Modifier.padding(start = 8.dp),
+            onClick = onBackClicked
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Voltar"
+            )
+        }
+        Text(
+            text = "Detalhes da Ação",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f)
+        )
+
+        Row(
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .clickable { onEditClicked() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Editar",
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(Modifier.padding(horizontal = 2.dp))
+            Text(
+                text = "Editar",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+    HorizontalDivider()
 }
 
 @Composable

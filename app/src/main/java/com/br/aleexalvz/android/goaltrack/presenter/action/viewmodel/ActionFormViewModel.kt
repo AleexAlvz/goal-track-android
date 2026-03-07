@@ -32,26 +32,30 @@ class ActionFormViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val actionId: Long by lazy { savedStateHandle.get<Long>(ACTION_ID_ARG) ?: -1L }
-    private val goalId: Long by lazy { savedStateHandle.get<Long>(GOAL_ID_ARG) ?: -1L }
-    private val isEditMode = actionId != -1L
-
-    private val _state = MutableStateFlow(ActionFormState(id = actionId, goalId = goalId))
+    private val _state = MutableStateFlow(
+        ActionFormState(
+            id = savedStateHandle.get<Long>(ACTION_ID_ARG) ?: -1L,
+            goalId = savedStateHandle.get<Long>(GOAL_ID_ARG) ?: -1L
+        )
+    )
     val state = _state.asStateFlow()
 
     private val _event = MutableSharedFlow<ActionFormEvent>()
     val event = _event.asSharedFlow()
 
     init {
+        val isEditMode = state.value.id != -1L
         if (isEditMode) {
             viewModelScope.launch(IO) {
-                actionRepository.getActionById(actionId).onSuccess { action ->
+                actionRepository.getActionById(state.value.id).onSuccess { action ->
                     _state.update {
                         it.copy(
                             id = action.id,
+                            goalId = action.goalId,
                             title = action.title,
                             description = action.description,
-                            frequency = action.frequency.toActionFrequencyEnum()
+                            frequency = action.frequency.toActionFrequencyEnum(),
+                            isEditMode = true
                         )
                     }
                 }.onFailure {
@@ -78,6 +82,16 @@ class ActionFormViewModel @Inject constructor(
             is ActionFormAction.Submit -> {
                 submitAction()
             }
+
+            ActionFormAction.Delete -> deleteAction()
+        }
+    }
+
+    private fun deleteAction() = viewModelScope.launch(IO) {
+        actionRepository.deleteActionById(state.value.id).onSuccess {
+            _event.emit(ActionFormEvent.Deleted)
+        }.onFailure {
+            _event.emit(ActionFormEvent.UnexpectedError)
         }
     }
 
@@ -99,7 +113,7 @@ class ActionFormViewModel @Inject constructor(
 
         if (hasValidFields()) {
             withContext(IO) {
-                val response = if (isEditMode) {
+                val response = if (state.value.isEditMode) {
                     actionRepository.updateAction(action = state.value.toActionModel())
                 } else {
                     actionRepository.createAction(action = state.value.toActionModel())
@@ -129,7 +143,7 @@ class ActionFormViewModel @Inject constructor(
     }
 
     private fun ActionFormState.toActionModel() = ActionModel(
-        id = actionId,
+        id = state.value.id,
         goalId = goalId,
         title = title,
         description = description,

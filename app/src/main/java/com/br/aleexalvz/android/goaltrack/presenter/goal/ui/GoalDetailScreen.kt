@@ -157,7 +157,7 @@ private fun GoalDetailHeader(onBackClicked: () -> Unit, onEditClicked: () -> Uni
             Icon(
                 modifier = Modifier.size(18.dp),
                 imageVector = Icons.Default.Edit,
-                contentDescription = "Voltar",
+                contentDescription = "Editar",
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.padding(horizontal = 2.dp))

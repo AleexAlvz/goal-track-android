@@ -7,4 +7,5 @@ sealed interface ActionFormAction {
     data class UpdateDescription(val description: String) : ActionFormAction
     data class UpdateFrequency(val frequency: ActionFrequencyEnum) : ActionFormAction
     data object Submit : ActionFormAction
+    data object Delete : ActionFormAction
 }

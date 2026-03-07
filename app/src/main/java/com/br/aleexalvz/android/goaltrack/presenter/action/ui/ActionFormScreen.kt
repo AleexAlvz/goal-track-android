@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -13,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,7 +59,14 @@ fun ActionFormScreen(
 
     ActionFormEventHandler(
         actionFormViewModel = actionFormViewModel,
-        onCreateSuccessfully = {
+        onSubmittedWithSuccess = {
+            navController.navigate(HomeRoutes.goalDetailWithId(actionState.goalId)) {
+                popUpTo(HomeRoutes.goalDetailWithId(actionState.goalId)) {
+                    inclusive = true
+                }
+            }
+        },
+        onDeleted = {
             navController.navigate(HomeRoutes.goalDetailWithId(actionState.goalId)) {
                 popUpTo(HomeRoutes.goalDetailWithId(actionState.goalId)) {
                     inclusive = true
@@ -67,7 +76,7 @@ fun ActionFormScreen(
     )
 
     ActionFormContent(
-        actionState = actionState,
+        actionFormState = actionState,
         onUIAction = actionFormViewModel::onUIAction,
         onBackClicked = { navController.popBackStack() }
     )
@@ -75,7 +84,7 @@ fun ActionFormScreen(
 
 @Composable
 fun ActionFormContent(
-    actionState: ActionFormState,
+    actionFormState: ActionFormState,
     onUIAction: (ActionFormAction) -> Unit,
     onBackClicked: () -> Unit
 ) {
@@ -84,21 +93,51 @@ fun ActionFormContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Button(
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(16.dp),
-            shape = RoundedCornerShape(12.dp),
-            onClick = { onUIAction(ActionFormAction.Submit) }
+                .padding(16.dp)
         ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Salvar ação",
-                fontSize = 16.sp
-            )
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                onClick = { onUIAction(ActionFormAction.Submit) }
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = if (actionFormState.isEditMode) {
+                        "Editar ação"
+                    } else {
+                        "Salvar ação"
+                    },
+                    fontSize = 16.sp
+                )
+            }
+
+            if (actionFormState.isEditMode) {
+                Spacer(Modifier.padding(8.dp))
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    onClick = { onUIAction(ActionFormAction.Delete) }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = "Excluir ação",
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -141,20 +180,20 @@ fun ActionFormContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            text = actionState.title,
+            text = actionFormState.title,
             labelText = "Título da ação",
             onValueChange = { onUIAction(ActionFormAction.UpdateTitle(it)) },
-            errorMessage = actionState.titleError
+            errorMessage = actionFormState.titleError
         )
 
         DefaultOutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            text = actionState.description.orEmpty(),
+            text = actionFormState.description.orEmpty(),
             labelText = "Descrição",
             onValueChange = { onUIAction(ActionFormAction.UpdateDescription(it)) },
-            errorMessage = actionState.descriptionError
+            errorMessage = actionFormState.descriptionError
         )
 
         TextFieldWithDropDown(
@@ -163,7 +202,7 @@ fun ActionFormContent(
                 .heightIn(min = 120.dp)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
             dropDownValues = ActionFrequencyEnum.entries.map { it.name },
-            text = actionState.frequency.getMessage(context),
+            text = actionFormState.frequency.getMessage(context),
             labelText = "Frequência",
             onSelectedItem = { onUIAction(ActionFormAction.UpdateFrequency(it.toActionFrequencyEnum())) }
         )
@@ -173,7 +212,8 @@ fun ActionFormContent(
 @Composable
 fun ActionFormEventHandler(
     actionFormViewModel: ActionFormViewModel,
-    onCreateSuccessfully: () -> Unit
+    onSubmittedWithSuccess: () -> Unit,
+    onDeleted: () -> Unit
 ) {
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -183,7 +223,8 @@ fun ActionFormEventHandler(
     LaunchedEffect(actionFormViewModel) {
         actionFormViewModel.event.collect { event ->
             when (event) {
-                is ActionFormEvent.Created -> onCreateSuccessfully()
+                is ActionFormEvent.Created -> onSubmittedWithSuccess()
+                is ActionFormEvent.Deleted -> onDeleted()
                 is ActionFormEvent.ConnectionError -> {
                     showDialog = true
                     dialogTitle = context.getString(R.string.network_error_title)
@@ -202,6 +243,7 @@ fun ActionFormEventHandler(
                     dialogTitle = context.getString(R.string.unexpected_error_title)
                     dialogMessage = context.getString(R.string.unexpected_error_message)
                 }
+
             }
         }
     }
@@ -221,7 +263,7 @@ fun ActionFormEventHandler(
 @Composable
 fun ActionFormScreenPreview() {
     ActionFormContent(
-        actionState = ActionFormState(),
+        actionFormState = ActionFormState(),
         onUIAction = { },
         onBackClicked = { }
     )

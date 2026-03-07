@@ -133,8 +133,8 @@ fun GoalFormContent(
                 }
             }
         }
-
     }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {

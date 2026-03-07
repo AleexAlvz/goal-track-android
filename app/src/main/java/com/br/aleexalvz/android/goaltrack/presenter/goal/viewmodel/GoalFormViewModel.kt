@@ -42,7 +42,8 @@ class GoalFormViewModel @Inject constructor(
     val event = _event.asSharedFlow()
 
     init {
-        if (goalId != -1L) {
+        val isEditMode = goalId != -1L
+        if (isEditMode) {
             viewModelScope.launch(IO) {
                 goalRepository.getGoalById(goalId).onSuccess { goal ->
                     _state.update {
@@ -130,8 +131,8 @@ class GoalFormViewModel @Inject constructor(
         }
     }
 
-    private fun deleteGoal() = viewModelScope.launch {
-        withContext(IO) { goalRepository.deleteGoalById(goalId) }.onSuccess {
+    private fun deleteGoal() = viewModelScope.launch(IO) {
+        goalRepository.deleteGoalById(goalId).onSuccess {
             _event.emit(GoalFormEvent.Deleted)
         }.onFailure {
             _event.emit(GoalFormEvent.UnexpectedError)
