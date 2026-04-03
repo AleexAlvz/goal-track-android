@@ -12,11 +12,14 @@ import com.br.aleexalvz.android.goaltrack.domain.model.note.NoteModel
 import com.br.aleexalvz.android.goaltrack.domain.repository.ActionRepository
 import com.br.aleexalvz.android.goaltrack.domain.repository.NoteRepository
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailAction
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailEvent
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,10 +34,13 @@ class ActionDetailViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ActionDetailState())
     val state = _state.asStateFlow()
-    val actionId: Long? = savedStateHandle[HomeRoutes.ACTION_ID_ARG]
+    val actionId: Long = savedStateHandle[HomeRoutes.ACTION_ID_ARG] ?: -1
+
+    private val _event = MutableSharedFlow<ActionDetailEvent>()
+    val event = _event.asSharedFlow()
 
     init {
-        if (actionId != null && actionId != -1L) {
+        if (actionId != -1L) {
             fetchActionDetail(actionId)
             fetchNotes(actionId)
         }
@@ -75,18 +81,29 @@ class ActionDetailViewModel @Inject constructor(
         }
     }
 
+    private fun deleteAction() = viewModelScope.launch(IO) {
+        actionRepository.deleteActionById(actionId).onSuccess {
+            _event.emit(ActionDetailEvent.Deleted)
+        }.onFailure {
+            _event.emit(ActionDetailEvent.UnexpectedError)
+        }
+    }
+
     fun onUIAction(uiAction: ActionDetailAction) {
         when (uiAction) {
-            is ActionDetailAction.addNote -> addNote(uiAction.note)
+            is ActionDetailAction.AddNote -> addNote(uiAction.note)
+            is ActionDetailAction.DeleteAction -> deleteAction()
+            is ActionDetailAction.CompleteAction -> completeAction()
         }
+    }
+
+    private fun completeAction() {
+        // TODO("Not yet implemented")
     }
 
     private fun addNote(note: String) = viewModelScope.launch(IO) {
         noteRepository.createNote(
-            NoteModel(
-                actionId = actionId!!,
-                notes = note
-            )
+            NoteModel(actionId = actionId, notes = note)
         ).onSuccess { newNote ->
             _state.update {
                 it.copy(

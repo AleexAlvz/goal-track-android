@@ -16,7 +16,7 @@ fun NavGraphBuilder.registerFeatureHomeRoutes(navController: NavController) {
     ) {
         composable(route = HomeRoutes.HOME_SCREEN) { HomeScreen(navController) }
         composable(route = HomeRoutes.GOALS) { GoalsScreen(navController) }
-        composable(route = HomeRoutes.CALENDAR) { CalendarScreen() }
+//        composable(route = HomeRoutes.CALENDAR) { CalendarScreen() } TODO create feature
         composable(route = HomeRoutes.SETTINGS) { SettingsScreen() }
     }
 }

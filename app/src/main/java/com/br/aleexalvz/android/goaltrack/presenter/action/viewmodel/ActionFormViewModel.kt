@@ -82,18 +82,10 @@ class ActionFormViewModel @Inject constructor(
             is ActionFormAction.Submit -> {
                 submitAction()
             }
-
-            ActionFormAction.Delete -> deleteAction()
         }
     }
 
-    private fun deleteAction() = viewModelScope.launch(IO) {
-        actionRepository.deleteActionById(state.value.id).onSuccess {
-            _event.emit(ActionFormEvent.Deleted)
-        }.onFailure {
-            _event.emit(ActionFormEvent.UnexpectedError)
-        }
-    }
+
 
     private fun updateFrequency(frequency: ActionFrequencyEnum) {
         _state.update { it.copy(frequency = frequency) }

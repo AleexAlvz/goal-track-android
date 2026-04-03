@@ -12,8 +12,11 @@ object LightThemeColors {
     val SecondaryColor = Color.White
     val OnSecondaryColor = Color.Black
 
-    val OnPrimaryContainer = PrimaryColor
-    val PrimaryContainer = PrimaryColor.copy(alpha = 0.3f)
+    val PrimaryContainer = PrimaryColor
+    val OnPrimaryContainer = OnPrimaryColor
+
+    val SecondaryContainer = SecondaryColor
+    val OnSecondaryContainer = OnSecondaryColor
 
     val SurfaceColor = Color.White
     val OnSurfaceColor = Color.Black
@@ -33,8 +36,11 @@ object DarkThemeColors {
     val SecondaryColor = Color(0xFF242C3D)
     val OnSecondaryColor = Color.White
 
-    val OnPrimaryContainer = PrimaryColor
-    val PrimaryContainer = PrimaryColor.copy(alpha = 0.3f)
+    val PrimaryContainer = PrimaryColor
+    val OnPrimaryContainer = OnPrimaryColor
+
+    val SecondaryContainer = SecondaryColor
+    val OnSecondaryContainer = OnSecondaryColor
 
     val SurfaceColor = Color(0xFF242C3D)
     val OnSurfaceColor = Color.White

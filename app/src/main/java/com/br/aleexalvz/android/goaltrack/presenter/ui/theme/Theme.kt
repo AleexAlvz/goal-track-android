@@ -18,6 +18,8 @@ private val LightTheme = lightColorScheme(
     onSurfaceVariant = LightThemeColors.OnSurfaceVariantColor,
     primaryContainer = LightThemeColors.PrimaryContainer,
     onPrimaryContainer = LightThemeColors.OnPrimaryContainer,
+    secondaryContainer = LightThemeColors.SecondaryContainer,
+    onSecondaryContainer = LightThemeColors.OnSecondaryContainer,
     error = LightThemeColors.ErrorColor,
     errorContainer = LightThemeColors.ErrorContainerColor
 )
@@ -35,6 +37,8 @@ private val DarkTheme = lightColorScheme(
     onSurfaceVariant = DarkThemeColors.OnSurfaceVariantColor,
     primaryContainer = DarkThemeColors.PrimaryContainer,
     onPrimaryContainer = DarkThemeColors.OnPrimaryContainer,
+    secondaryContainer = DarkThemeColors.SecondaryContainer,
+    onSecondaryContainer = DarkThemeColors.OnSecondaryContainer,
     error = DarkThemeColors.ErrorColor,
     errorContainer = DarkThemeColors.ErrorContainerColor
 )

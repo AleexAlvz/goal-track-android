@@ -1,13 +1,12 @@
 package com.br.aleexalvz.android.goaltrack.core.network.data
 
 import com.br.aleexalvz.android.goaltrack.core.common.JsonHelper
+import com.br.aleexalvz.android.goaltrack.core.network.di.MainOkhttpClient
 import com.br.aleexalvz.android.goaltrack.core.network.domain.NetworkProvider
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkError
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkException
-import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkHeaders
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkRequest
 import com.br.aleexalvz.android.goaltrack.core.network.model.NetworkResponse
-import com.br.aleexalvz.android.goaltrack.data.session.SessionManager
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.serializer
 import okhttp3.Headers
@@ -21,12 +20,12 @@ import java.io.IOException
 import java.net.SocketTimeoutException
 import javax.inject.Inject
 
-private const val BASE_URL_TEST = "http://10.0.2.2:8080/"
-private const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
+const val BASE_URL_TEST = "http://10.0.2.2:8080/"
+const val JSON_MEDIA_TYPE = "application/json; charset=utf-8"
 private const val UNEXPECTED_RESPONSE_BODY_NULL = "Response body is empty but was expected"
 
 class NetworkProviderImpl @Inject constructor(
-    private val okHttpClient: OkHttpClient
+    @MainOkhttpClient private val okHttpClient: OkHttpClient
 ) : NetworkProvider {
 
     override suspend fun <T> request(
@@ -96,23 +95,16 @@ class NetworkProviderImpl @Inject constructor(
     private fun getRequest(networkRequest: NetworkRequest) =
         Request.Builder()
             .url(networkRequest.getUrl())
-            .headers(networkRequest.getOkhttpHeaders())
+            .headers(networkRequest.getHeaders())
             .method(
                 method = networkRequest.method.name,
                 body = networkRequest.getRequestBody()
             )
             .build()
 
-    private fun NetworkRequest.getOkhttpHeaders(): Headers = Headers.Builder().apply {
+    private fun NetworkRequest.getHeaders(): Headers = Headers.Builder().apply {
         headers?.forEach { (key, value) -> add(key, value) }
-        addAuthToken()
     }.build()
-
-    private fun Headers.Builder.addAuthToken() {
-        SessionManager.session?.authToken.takeIf { !it.isNullOrBlank() }?.let {
-            add(NetworkHeaders.AUTHORIZATION, "Bearer $it")
-        }
-    }
 
     private fun NetworkRequest.getUrl(): String = BASE_URL_TEST + endpoint
 

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,8 +58,8 @@ fun ActionFormScreen(
     ActionFormEventHandler(
         actionFormViewModel = actionFormViewModel,
         onSubmittedWithSuccess = {
-            navController.navigate(HomeRoutes.goalDetailWithId(actionState.goalId)) {
-                popUpTo(HomeRoutes.goalDetailWithId(actionState.goalId)) {
+            navController.navigate(HomeRoutes.actionDetailWithId(actionState.id)) {
+                popUpTo(HomeRoutes.actionDetailWithId(actionState.id)) {
                     inclusive = true
                 }
             }
@@ -113,27 +111,6 @@ fun ActionFormContent(
                     },
                     fontSize = 16.sp
                 )
-            }
-
-            if (actionFormState.isEditMode) {
-                Spacer(Modifier.padding(8.dp))
-
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.error,
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    onClick = { onUIAction(ActionFormAction.Delete) }
-                ) {
-                    Text(
-                        modifier = Modifier.padding(8.dp),
-                        text = "Excluir ação",
-                        fontSize = 16.sp
-                    )
-                }
             }
         }
     }

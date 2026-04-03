@@ -6,28 +6,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,20 +31,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionFrequencyEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionModel
 import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
 import com.br.aleexalvz.android.goaltrack.domain.model.note.NoteModel
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailAction
+import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailEvent
 import com.br.aleexalvz.android.goaltrack.presenter.action.model.ActionDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.action.viewmodel.ActionDetailViewModel
+import com.br.aleexalvz.android.goaltrack.presenter.components.chip.InformativeChip
+import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
+import com.br.aleexalvz.android.goaltrack.presenter.components.fab.FabMenu
+import com.br.aleexalvz.android.goaltrack.presenter.components.fab.FabMenuItem
+import com.br.aleexalvz.android.goaltrack.presenter.components.header.PageHeader
 import com.br.aleexalvz.android.goaltrack.presenter.components.header.SectionHeader
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
 import com.br.aleexalvz.android.goaltrack.presenter.ui.theme.GoalTrackTheme
@@ -61,6 +63,19 @@ fun ActionDetailScreen(
     viewModel: ActionDetailViewModel = hiltViewModel()
 ) {
     val actionDetailState by viewModel.state.collectAsState()
+
+    ActionDetailEventHandler(
+        actionDetailViewModel = viewModel,
+        onDeleted = {
+            actionDetailState.action?.goalId?.let { goalId ->
+                navController.navigate(HomeRoutes.goalDetailWithId(goalId)) {
+                    popUpTo(HomeRoutes.goalDetailWithId(goalId)) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    )
 
     ActionDetailContent(
         actionDetailState = actionDetailState,
@@ -83,8 +98,8 @@ fun ActionDetailScreen(
 @Composable
 fun ActionDetailContent(
     actionDetailState: ActionDetailState,
-    onBackClicked: () -> Unit = {},
-    onEditClicked: () -> Unit = {},
+    onBackClicked: () -> Unit,
+    onEditClicked: () -> Unit,
     onUIAction: (uiAction: ActionDetailAction) -> Unit = {}
 ) {
 
@@ -98,10 +113,7 @@ fun ActionDetailContent(
             modifier = Modifier.fillMaxSize()
         ) {
             item {
-                ActionDetailHeader(
-                    onBackClicked = onBackClicked,
-                    onEditClicked = onEditClicked
-                )
+                PageHeader(title = "Detalhes da Ação", onBackClicked = onBackClicked)
             }
 
             item {
@@ -110,18 +122,12 @@ fun ActionDetailContent(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ) {
-                        Text(
-                            text = actionDetailState.action?.frequency?.getMessage(context)
-                                .orEmpty(),
-                            style = MaterialTheme.typography.labelLarge,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
-                    }
+                    InformativeChip(
+                        text = actionDetailState.action?.frequency?.getMessage(context)
+                            .orEmpty(),
+                        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                     Spacer(Modifier.padding(4.dp))
                     Text(
                         text = actionDetailState.action?.title.orEmpty(),
@@ -152,7 +158,7 @@ fun ActionDetailContent(
                             .fillMaxWidth()
                             .padding(16.dp),
                         onNoteSaved = { note ->
-                            onUIAction(ActionDetailAction.addNote(note))
+                            onUIAction(ActionDetailAction.AddNote(note))
                             showNoteForm = false
                         },
                         onCanceled = { showNoteForm = false }
@@ -175,59 +181,71 @@ fun ActionDetailContent(
                 Spacer(modifier = Modifier.height(100.dp))
             }
         }
+
+        FabMenu(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd),
+            items = listOf(
+                FabMenuItem(
+                    icon = Icons.Default.Edit,
+                    label = "Editar",
+                    onClick = onEditClicked
+                ),
+                FabMenuItem(
+                    icon = Icons.Default.Check,
+                    label = "Completar",
+                    onClick = { onUIAction(ActionDetailAction.CompleteAction) }
+                ),
+                FabMenuItem(
+                    icon = Icons.Default.Delete,
+                    label = "Excluir",
+                    onClick = { onUIAction(ActionDetailAction.DeleteAction) }
+                )
+            )
+        )
     }
 }
 
 @Composable
-private fun ActionDetailHeader(
-    onBackClicked: () -> Unit,
-    onEditClicked: () -> Unit
+fun ActionDetailEventHandler(
+    actionDetailViewModel: ActionDetailViewModel,
+    onDeleted: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        IconButton(
-            modifier = Modifier.padding(start = 8.dp),
-            onClick = onBackClicked
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Voltar"
-            )
-        }
-        Text(
-            text = "Detalhes da Ação",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(1f)
-        )
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var dialogTitle by remember { mutableStateOf("") }
 
-        Row(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .clickable { onEditClicked() },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(18.dp),
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Editar",
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.padding(horizontal = 2.dp))
-            Text(
-                text = "Editar",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
+    LaunchedEffect(actionDetailViewModel) {
+        actionDetailViewModel.event.collect { event ->
+            when (event) {
+                is ActionDetailEvent.Deleted -> onDeleted()
+
+                is ActionDetailEvent.ConnectionError -> {
+                    showDialog = true
+                    dialogTitle = context.getString(R.string.network_error_title)
+                    dialogMessage = context.getString(R.string.network_error_message)
+                }
+
+                is ActionDetailEvent.UnexpectedError -> {
+                    showDialog = true
+                    dialogTitle = context.getString(R.string.unexpected_error_title)
+                    dialogMessage = context.getString(R.string.unexpected_error_message)
+                }
+            }
         }
     }
-    HorizontalDivider()
+
+    if (showDialog) {
+        ErrorDialog(
+            title = dialogTitle,
+            message = dialogMessage,
+            confirmText = stringResource(R.string.ok),
+            onConfirm = { showDialog = false },
+            onDismiss = { showDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -290,7 +308,9 @@ fun ActionDetailScreenPreview() {
                 notes = listOf(
                     NoteModel(0L, 0L, LocalDate.now(), "Nota de progresso: Hoje eu fiz algo")
                 )
-            )
+            ),
+            onBackClicked = {},
+            onEditClicked = {}
         )
     }
 }
@@ -314,7 +334,9 @@ fun ActionDetailScreenPreviewDark() {
                 notes = listOf(
                     NoteModel(0L, 0L, LocalDate.now(), "Nota de progresso: Hoje eu fiz algo")
                 )
-            )
+            ),
+            onBackClicked = {},
+            onEditClicked = {}
         )
     }
 }

@@ -19,26 +19,34 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.br.aleexalvz.android.goaltrack.R
 import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionFrequencyEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.action.ActionModel
 import com.br.aleexalvz.android.goaltrack.domain.model.action.getMessage
@@ -54,8 +63,15 @@ import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.GoalStatusEnum
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.SkillModel
 import com.br.aleexalvz.android.goaltrack.domain.model.goal.getMessage
+import com.br.aleexalvz.android.goaltrack.presenter.components.button.PrimaryButton
 import com.br.aleexalvz.android.goaltrack.presenter.components.chip.InformativeChip
+import com.br.aleexalvz.android.goaltrack.presenter.components.dialog.ErrorDialog
+import com.br.aleexalvz.android.goaltrack.presenter.components.fab.FabMenu
+import com.br.aleexalvz.android.goaltrack.presenter.components.fab.FabMenuItem
+import com.br.aleexalvz.android.goaltrack.presenter.components.header.PageHeader
 import com.br.aleexalvz.android.goaltrack.presenter.components.header.SectionHeader
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalDetailAction
+import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalDetailEvent
 import com.br.aleexalvz.android.goaltrack.presenter.goal.data.GoalDetailState
 import com.br.aleexalvz.android.goaltrack.presenter.goal.viewmodel.GoalDetailViewModel
 import com.br.aleexalvz.android.goaltrack.presenter.home.navigation.HomeRoutes
@@ -68,7 +84,14 @@ fun GoalDetailScreen(
     viewModel: GoalDetailViewModel = hiltViewModel()
 ) {
 
-    val goalDetailState by viewModel.goal.collectAsState()
+    val goalDetailState by viewModel.goalDetailState.collectAsState()
+
+    GoalDetailEventHandler(
+        goalDetailViewModel = viewModel,
+        onCompleted = {
+            navController.navigate(HomeRoutes.GOALS)
+        }
+    )
 
     GoalDetailContent(
         goalDetailState = goalDetailState,
@@ -87,6 +110,9 @@ fun GoalDetailScreen(
         },
         onNavigateToActionDetail = { actionId ->
             navController.navigate(HomeRoutes.actionDetailWithId(actionId))
+        },
+        onCompleteGoal = {
+            viewModel.onUIAction(GoalDetailAction.CompleteGoal)
         }
     )
 }
@@ -96,6 +122,7 @@ fun GoalDetailContent(
     goalDetailState: GoalDetailState,
     onBackClicked: () -> Unit,
     onEditClicked: () -> Unit,
+    onCompleteGoal: () -> Unit,
     onNavigateToCreateAction: () -> Unit,
     onNavigateToActionDetail: (actionId: Long) -> Unit,
 ) {
@@ -108,8 +135,9 @@ fun GoalDetailContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            item { GoalDetailHeader(onBackClicked, onEditClicked) }
+            item { PageHeader(title = "Detalhes da Meta", onBackClicked = onBackClicked) }
             item { GoalDetailSection(goalDetailState, context) }
+            item { GoalProgressSection(goalDetailState, onCompleteGoal) }
             skillListSection(goalDetailState.goal?.skills ?: emptyList())
             actionListSection(
                 actions = goalDetailState.actions,
@@ -118,57 +146,111 @@ fun GoalDetailContent(
             )
             item { Spacer(modifier = Modifier.height(100.dp)) }
         }
+
+        FabMenu(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd),
+            items = listOf(
+                FabMenuItem(
+                    icon = Icons.Default.Edit,
+                    label = "Editar",
+                    onClick = onEditClicked
+                ),
+                FabMenuItem(
+                    icon = Icons.Default.Check,
+                    label = "Completar",
+                    onClick = onCompleteGoal
+                ),
+                FabMenuItem(
+                    icon = Icons.Default.Delete,
+                    label = "Excluir",
+                    onClick = { "OndeleteGoal" }
+                )
+            )
+        )
     }
 }
 
 @Composable
-private fun GoalDetailHeader(onBackClicked: () -> Unit, onEditClicked: () -> Unit) {
-    Row(
+private fun GoalProgressSection(
+    goalDetailState: GoalDetailState,
+    onCompleteGoal: () -> Unit
+) {
+    val completed = goalDetailState.actions.filter { it.endDate != null }.size
+    val progress: Float = if (goalDetailState.actions.isEmpty()) {
+        0F
+    } else {
+        (completed.toFloat() / goalDetailState.actions.size)
+    }
+
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        IconButton(
-            modifier = Modifier.padding(start = 8.dp),
-            onClick = onBackClicked
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Voltar"
-            )
-        }
-
-        Text(
-            text = "Detalhes da Meta",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
+            .padding(16.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                shape = CardDefaults.shape
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
         )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = "Progresso geral",
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "${(progress * 100).toInt()}%",
+                    fontSize = 24.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
 
-        Row(
-            modifier = Modifier
-                .padding(end = 16.dp)
-                .clickable { onEditClicked() },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(18.dp),
-                imageVector = Icons.Default.Edit,
-                contentDescription = "Editar",
-                tint = MaterialTheme.colorScheme.primary
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                progress = { progress }
             )
-            Spacer(Modifier.padding(horizontal = 2.dp))
-            Text(
-                text = "Editar",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Spacer(modifier = Modifier.padding(4.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                goalDetailState.goal?.creationDate.toString().let { creationDate ->
+                    Text(
+                        text = "Inicio: $creationDate",
+                        fontSize = 12.sp
+                    )
+                }
+                Text(
+                    text = "$completed/${goalDetailState.actions.size} ações concluídas",
+                    fontSize = 12.sp
+                )
+            }
+
+            if (progress.equals(1F) && completed > 0) {
+                Spacer(Modifier.padding(16.dp))
+                PrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = "Concluir meta",
+                    onClick = onCompleteGoal
+                )
+            }
         }
     }
-    HorizontalDivider()
 }
 
 @Composable
@@ -302,8 +384,14 @@ fun ActionListItem(
                     disabledContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
+                val actionIcon: ImageVector = if (action.endDate == null) {
+                    Icons.Default.RadioButtonUnchecked
+                } else {
+                    Icons.Default.TaskAlt
+                }
+
                 Icon(
-                    imageVector = Icons.Default.TaskAlt,
+                    imageVector = actionIcon,
                     contentDescription = "Imagem",
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
@@ -342,66 +430,143 @@ fun ActionListItem(
     }
 }
 
+@Composable
+private fun GoalDetailEventHandler(
+    goalDetailViewModel: GoalDetailViewModel,
+    onCompleted: () -> Unit,
+) {
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var dialogTitle by remember { mutableStateOf("") }
+
+    LaunchedEffect(goalDetailViewModel) {
+        goalDetailViewModel.goalDetailEvent.collect { event ->
+            when (event) {
+                is GoalDetailEvent.Completed -> onCompleted()
+                is GoalDetailEvent.ConnectionError -> {
+                    showDialog = true
+                    dialogTitle = context.getString(R.string.network_error_title)
+                    dialogMessage = context.getString(R.string.network_error_message)
+                }
+
+                is GoalDetailEvent.UnexpectedError -> {
+                    showDialog = true
+                    dialogTitle = context.getString(R.string.unexpected_error_title)
+                    dialogMessage = context.getString(R.string.unexpected_error_message)
+                }
+            }
+        }
+    }
+
+    if (showDialog) {
+        ErrorDialog(
+            title = dialogTitle,
+            message = dialogMessage,
+            confirmText = stringResource(R.string.ok),
+            onConfirm = { showDialog = false },
+            onDismiss = { showDialog = false }
+        )
+    }
+}
+
+private fun getGoalToPreview() = GoalModel(
+    id = 1,
+    title = "Correr 5km na semana",
+    description = "Manter o hábito de correr para melhorar o condicionamento físico e a saúde.",
+    status = GoalStatusEnum.IN_PROGRESS,
+    category = GoalCategoryEnum.CAREER,
+    creationDate = LocalDate.now()
+)
+
+private fun getActionsToPreview(totalSize: Int, completed: Int) =
+    mutableListOf<ActionModel>().apply {
+        repeat(totalSize) { index ->
+            add(
+                ActionModel(
+                    id = index.toLong(),
+                    title = "Ação $index",
+                    description = "Descrição da ação $index",
+                    frequency = ActionFrequencyEnum.ONCE, // Ação única
+                    goalId = 1,
+                    endDate = if (index < (totalSize - completed)) null else LocalDate.now()
+                )
+            )
+        }
+    }
+
 @Preview(showBackground = true)
 @Composable
-fun GoalDetailScreenPreview() {
-    val previewGoal = GoalModel(
-        id = 1,
-        title = "Correr 5km na semana",
-        description = "Manter o hábito de correr para melhorar o condicionamento físico e a saúde.",
-        status = GoalStatusEnum.IN_PROGRESS,
-        category = GoalCategoryEnum.CAREER,
-        creationDate = LocalDate.now()
-    )
-
-    val actions = listOf(
-        ActionModel(
-            id = 1L,
-            title = "Comprar tênis de corrida que seja confortável",
-            description = "Ir à loja de esportes e escolher um tênis adequado para corrida.",
-            frequency = ActionFrequencyEnum.ONCE, // Ação única
-            goalId = 1
-        ),
-        ActionModel(
-            id = 2L,
-            title = "Corrida leve - 1km",
-            description = "Primeira corrida para aquecer e acostumar o corpo.",
-            frequency = ActionFrequencyEnum.WEEKLY, // Ação semanal
-            goalId = 1
-        ),
-        ActionModel(
-            id = 3L,
-            title = "Caminhada rápida - 30 min",
-            description = "Manter o cardio em dias de descanso da corrida.",
-            frequency = ActionFrequencyEnum.DAILY, // Ação diária
-            goalId = 1
-        ),
-        ActionModel(
-            id = 4L,
-            title = "Corrida intermediária - 2.5km",
-            description = "Aumentar a distância no meio da semana.",
-            frequency = ActionFrequencyEnum.WEEKLY,
-            goalId = 1
-        ),
-        ActionModel(
-            id = 5L,
-            title = "Alongamento pós-treino",
-            description = "Alongar por 10 minutos após cada corrida para evitar lesões.",
-            frequency = ActionFrequencyEnum.DAILY,
-            goalId = 1
-        )
-    )
-
+private fun GoalDetailScreenPreviewCompleted() {
     GoalTrackTheme {
+        GoalTrackTheme {
+            GoalDetailContent(
+                goalDetailState = GoalDetailState(
+                    goal = getGoalToPreview(),
+                    actions = getActionsToPreview(2, 2)
+                ),
+                onBackClicked = {},
+                onEditClicked = {},
+                onNavigateToCreateAction = {},
+                onNavigateToActionDetail = {},
+                onCompleteGoal = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GoalDetailScreenPreviewTotallyInProgress() {
+    GoalTrackTheme {
+        GoalTrackTheme {
+            GoalDetailContent(
+                goalDetailState = GoalDetailState(
+                    goal = getGoalToPreview(),
+                    actions = getActionsToPreview(2, 0)
+                ),
+                onBackClicked = {},
+                onEditClicked = {},
+                onNavigateToCreateAction = {},
+                onNavigateToActionDetail = {},
+                onCompleteGoal = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GoalDetailScreenPreviewDarkHalfProgress() {
+    GoalTrackTheme(darkTheme = true) {
         GoalDetailContent(
             goalDetailState = GoalDetailState(
-                goal = previewGoal,
-                actions = actions
+                goal = getGoalToPreview(),
+                actions = getActionsToPreview(2, 1)
             ),
             onBackClicked = {},
             onEditClicked = {},
             onNavigateToCreateAction = {},
-            onNavigateToActionDetail = {}
+            onNavigateToActionDetail = {},
+            onCompleteGoal = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun GoalDetailScreenPreviewDarkEmptyActions() {
+    GoalTrackTheme(darkTheme = true) {
+        GoalDetailContent(
+            goalDetailState = GoalDetailState(
+                goal = getGoalToPreview(),
+                actions = getActionsToPreview(0, 0)
+            ),
+            onBackClicked = {},
+            onEditClicked = {},
+            onNavigateToCreateAction = {},
+            onNavigateToActionDetail = {},
+            onCompleteGoal = {}
         )
     }
 }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TaskAlt
@@ -63,11 +62,12 @@ fun AppNavGraph(
             HomeRoutes.GOALS,
             Icons.Filled.TaskAlt
         ),
-        BottomNavItem(
-            stringResource(R.string.tabbar_calendar),
-            HomeRoutes.CALENDAR,
-            Icons.Filled.Flag
-        ),
+        // TODO create feature
+//        BottomNavItem(
+//            stringResource(R.string.tabbar_calendar),
+//            HomeRoutes.CALENDAR,
+//            Icons.Filled.Flag
+//        ),
         BottomNavItem(
             stringResource(R.string.tabbar_settings),
             HomeRoutes.SETTINGS,
