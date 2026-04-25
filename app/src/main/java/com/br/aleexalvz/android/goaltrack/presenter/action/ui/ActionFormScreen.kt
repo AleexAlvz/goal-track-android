@@ -57,9 +57,9 @@ fun ActionFormScreen(
 
     ActionFormEventHandler(
         actionFormViewModel = actionFormViewModel,
-        onSubmittedWithSuccess = {
-            navController.navigate(HomeRoutes.actionDetailWithId(actionState.id)) {
-                popUpTo(HomeRoutes.actionDetailWithId(actionState.id)) {
+        onSubmittedWithSuccess = { actionId ->
+            navController.navigate(HomeRoutes.actionDetailWithId(actionId)) {
+                popUpTo(HomeRoutes.actionDetailWithId(actionId)) {
                     inclusive = true
                 }
             }
@@ -189,7 +189,7 @@ fun ActionFormContent(
 @Composable
 fun ActionFormEventHandler(
     actionFormViewModel: ActionFormViewModel,
-    onSubmittedWithSuccess: () -> Unit,
+    onSubmittedWithSuccess: (actionId: Long) -> Unit,
     onDeleted: () -> Unit
 ) {
     val context = LocalContext.current
@@ -200,7 +200,7 @@ fun ActionFormEventHandler(
     LaunchedEffect(actionFormViewModel) {
         actionFormViewModel.event.collect { event ->
             when (event) {
-                is ActionFormEvent.Created -> onSubmittedWithSuccess()
+                is ActionFormEvent.Created -> onSubmittedWithSuccess(event.actionId)
                 is ActionFormEvent.Deleted -> onDeleted()
                 is ActionFormEvent.ConnectionError -> {
                     showDialog = true

@@ -111,9 +111,16 @@ class ActionFormViewModel @Inject constructor(
                     actionRepository.createAction(action = state.value.toActionModel())
                 }
 
-                response.onSuccess {
-                    _state.update { it.copy(isLoading = false) }
-                    _event.emit(ActionFormEvent.Created)
+                response.onSuccess { action ->
+                    _state.update {
+                        it.copy(
+                            id = action.id,
+                            goalId = action.goalId,
+                            isLoading = false,
+                            isEditMode = true
+                        )
+                    }
+                    _event.emit(ActionFormEvent.Created(action.id))
                 }.onFailure {
                     _state.update { it.copy(isLoading = false) }
                     _event.emit(ActionFormEvent.UnexpectedError)

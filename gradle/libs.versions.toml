@@ -20,6 +20,7 @@ androidx-datastore = "1.1.1"
 protobuf-javalite = "3.25.3"
 plugin-protobuf = "0.9.6"
 androidx-core-splashscreen = "1.0.0"
+kotlinx-coroutines-test = "1.8.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +52,7 @@ okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
 
 kotlin-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialization" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
