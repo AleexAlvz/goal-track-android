@@ -180,7 +180,6 @@ private fun shouldShowNavigationBar(currentRoute: String): Boolean {
     val notAllowedRoutesToShowNavigationBar = listOf(
         LoginRoutes.LOGIN,
         LoginRoutes.SIGN_UP,
-        LoginRoutes.RECOVERY_PASSWORD,
         StartDestination.LOADING.route
     )
 

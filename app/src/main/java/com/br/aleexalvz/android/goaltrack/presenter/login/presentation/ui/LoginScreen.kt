@@ -72,8 +72,7 @@ fun LoginScreen(
         modifier = modifier,
         loginState = loginState,
         onUIAction = loginViewModel::onUIAction,
-        onSignupClickListener = { navController.navigate(LoginRoutes.SIGN_UP) },
-        onRecoveryPasswordClickListener = { navController.navigate(LoginRoutes.RECOVERY_PASSWORD) }
+        onSignupClickListener = { navController.navigate(LoginRoutes.SIGN_UP) }
     )
 }
 
@@ -82,8 +81,7 @@ fun LoginContent(
     modifier: Modifier = Modifier,
     loginState: LoginState,
     onUIAction: ((LoginAction) -> Unit),
-    onSignupClickListener: (() -> Unit),
-    onRecoveryPasswordClickListener: (() -> Unit)
+    onSignupClickListener: (() -> Unit)
 ) {
     Column(
         modifier = modifier
@@ -166,16 +164,6 @@ fun LoginContent(
                 textSize = 14.sp
             )
 
-            Text(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clickable { onRecoveryPasswordClickListener() },
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                text = "Recuperar senha",
-                fontSize = 14.sp,
-                textDecoration = TextDecoration.Underline
-            )
         }
 
         Button(
@@ -307,7 +295,6 @@ fun LoginScreenPreview() {
             passwordError = null
         ),
         onUIAction = {},
-        onSignupClickListener = {},
-        onRecoveryPasswordClickListener = {}
+        onSignupClickListener = {}
     )
 }
